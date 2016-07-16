@@ -1,0 +1,47 @@
+--- a/hotspot/src/cpu/zero/vm/cppInterpreter_zero.hpp
++++ b/hotspot/src/cpu/zero/vm/cppInterpreter_zero.hpp
+@@ -48,5 +48,6 @@
+   static BasicType result_type_of_handle(oop method_handle);
+   static intptr_t* calculate_unwind_sp(ZeroStack* stack, oop method_handle);
+   static void throw_exception(JavaThread* thread, Symbol* name,char *msg=NULL);
++  static BasicType result_type_of(Method* method);
+ 
+ #endif // CPU_ZERO_VM_CPPINTERPRETER_ZERO_HPP
+--- a/hotspot/src/cpu/zero/vm/cppInterpreter_zero.cpp
++++ b/hotspot/src/cpu/zero/vm/cppInterpreter_zero.cpp
+@@ -184,7 +184,7 @@ void CppInterpreter::main_loop(int recur
+     }
+     else if (istate->msg() == BytecodeInterpreter::return_from_method) {
+       // Copy the result into the caller's frame
+-      result_slots = type2size[method->result_type()];
++      result_slots = type2size[result_type_of(method)];
+       assert(result_slots >= 0 && result_slots <= 2, "what?");
+       result = istate->stack() + result_slots;
+       break;
+@@ -796,6 +796,26 @@ int AbstractInterpreter::BasicType_as_in
+   return i;
+ }
+ 
++BasicType CppInterpreter::result_type_of(Method* method) {
++  BasicType t;
++  switch (method->result_index()) {
++    case 0 : t = T_BOOLEAN; break;
++    case 1 : t = T_CHAR;    break;
++    case 2 : t = T_BYTE;    break;
++    case 3 : t = T_SHORT;   break;
++    case 4 : t = T_INT;     break;
++    case 5 : t = T_LONG;    break;
++    case 6 : t = T_VOID;    break;
++    case 7 : t = T_FLOAT;   break;
++    case 8 : t = T_DOUBLE;  break;
++    case 9 : t = T_OBJECT;  break;
++    default: ShouldNotReachHere();
++  }
++  assert(AbstractInterpreter::BasicType_as_index(t) == method->result_index(),
++         "out of step with AbstractInterpreter::BasicType_as_index");
++  return t;
++}
++
+ address InterpreterGenerator::generate_empty_entry() {
+   if (!UseFastEmptyMethods)
+     return NULL;

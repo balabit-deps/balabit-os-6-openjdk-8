@@ -1,0 +1,85 @@
+Index: b/jdk/make/CompileDemos.gmk
+===================================================================
+--- a/jdk/make/CompileDemos.gmk
++++ b/jdk/make/CompileDemos.gmk
+@@ -235,10 +235,12 @@ define SetupJVMTIDemo
+   $1_CXXFLAGS := $(CXXFLAGS_JDKLIB) -I$(JDK_TOPDIR)/src/share/demo/jvmti/$1 \
+       $$(BUILD_DEMO_JVMTI_$1_EXTRA_INC) $3 \
+       $(CXXFLAGS_DEBUG_SYMBOLS)
++  ifeq ($(OPENJDK_TARGET_OS), solaris)
+   ifeq ($1-$(OPENJDK_TARGET_CPU_ARCH), waiters-sparc)
+     $1_FILTER := -xregs=no%appl
+     $1_CXXFLAGS := $$(filter-out $$($1_FILTER), $$($1_CXXFLAGS))
+   endif
++  endif
+ 
+   # Workaround for CFLAGS_JDKLIB containing ',' on solaris. If this is added as 'CFLAGS' to the
+   # eval call below, the comma gets expanded too early.
+Index: b/jdk/make/CompileLaunchers.gmk
+===================================================================
+--- a/jdk/make/CompileLaunchers.gmk
++++ b/jdk/make/CompileLaunchers.gmk
+@@ -443,10 +443,12 @@ else
+ 
+ endif
+ 
++ifeq ($(OPENJDK_TARGET_OS), solaris)
+ ifeq ($(OPENJDK_TARGET_CPU_ARCH), sparc)
+   UNPACKEXE_CFLAGS += -xregs=no%appl
+   UNPACKEXE_LDFLAGS_solaris += -xmemalign=4s
+ endif
++endif
+ 
+ UNPACKEXE_LANG := C
+ ifeq ($(OPENJDK_TARGET_OS), solaris)
+Index: b/jdk/make/lib/SecurityLibraries.gmk
+===================================================================
+--- a/jdk/make/lib/SecurityLibraries.gmk
++++ b/jdk/make/lib/SecurityLibraries.gmk
+@@ -228,9 +228,11 @@ ifeq ($(ENABLE_INTREE_EC), yes)
+   # except!!! libsunec.so
+   #
+   ECC_JNI_SOLSPARC_FILTER :=
++  ifeq ($(OPENJDK_TARGET_OS), solaris)
+   ifeq ($(OPENJDK_TARGET_CPU_ARCH), sparc)
+     ECC_JNI_SOLSPARC_FILTER := -xregs=no%appl
+   endif
++  endif
+ 
+   $(eval $(call SetupNativeCompilation,BUILD_LIBSUNEC, \
+       LIBRARY := sunec, \
+Index: b/common/autoconf/generated-configure.sh
+===================================================================
+--- a/common/autoconf/generated-configure.sh
++++ b/common/autoconf/generated-configure.sh
+@@ -6881,7 +6881,7 @@ test -n "$target_alias" &&
+       VAR_CPU_BITS=32
+       VAR_CPU_ENDIAN=big
+       ;;
+-    sparcv9)
++    sparcv9|sparc64)
+       VAR_CPU=sparcv9
+       VAR_CPU_ARCH=sparc
+       VAR_CPU_BITS=64
+@@ -7024,7 +7024,7 @@ $as_echo "$OPENJDK_BUILD_OS-$OPENJDK_BUI
+       VAR_CPU_BITS=32
+       VAR_CPU_ENDIAN=big
+       ;;
+-    sparcv9)
++    sparcv9|sparc64)
+       VAR_CPU=sparcv9
+       VAR_CPU_ARCH=sparc
+       VAR_CPU_BITS=64
+Index: b/common/autoconf/platform.m4
+===================================================================
+--- a/common/autoconf/platform.m4
++++ b/common/autoconf/platform.m4
+@@ -150,7 +150,7 @@ AC_DEFUN([PLATFORM_EXTRACT_VARS_FROM_CPU
+       VAR_CPU_BITS=32
+       VAR_CPU_ENDIAN=big
+       ;;
+-    sparcv9)
++    sparcv9|sparc64)
+       VAR_CPU=sparcv9
+       VAR_CPU_ARCH=sparc
+       VAR_CPU_BITS=64

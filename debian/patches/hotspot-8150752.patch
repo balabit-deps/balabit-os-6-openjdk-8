@@ -1,0 +1,333 @@
+# HG changeset patch
+# User iklam
+# Date 1458880695 25200
+#      Thu Mar 24 21:38:15 2016 -0700
+# Node ID 50e62b688ddcfa16d425a03675ec2a72ffc7a945
+# Parent  bde4021b44f2f90ca4edfa755143536f0c58d383
+8150752: Share Class Data
+Reviewed-by: acorn, hseigel, mschoene
+
+diff --git openjdk/hotspot/src/share/vm/classfile/dictionary.cpp openjdk/hotspot/src/share/vm/classfile/dictionary.cpp
+--- openjdk/hotspot/src/share/vm/classfile/dictionary.cpp
++++ openjdk/hotspot/src/share/vm/classfile/dictionary.cpp
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 2003, 2014, Oracle and/or its affiliates. All rights reserved.
++ * Copyright (c) 2003, 2016, Oracle and/or its affiliates. All rights reserved.
+  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+  *
+  * This code is free software; you can redistribute it and/or modify it
+@@ -25,6 +25,7 @@
+ #include "precompiled.hpp"
+ #include "classfile/dictionary.hpp"
+ #include "classfile/systemDictionary.hpp"
++#include "classfile/systemDictionaryShared.hpp"
+ #include "memory/iterator.hpp"
+ #include "oops/oop.inline.hpp"
+ #include "prims/jvmtiRedefineClassesTrace.hpp"
+@@ -36,9 +37,16 @@
+ DictionaryEntry*  Dictionary::_current_class_entry = NULL;
+ int               Dictionary::_current_class_index =    0;
+ 
++size_t Dictionary::entry_size() {
++  if (DumpSharedSpaces) {
++    return SystemDictionaryShared::dictionary_entry_size();
++  } else {
++    return sizeof(DictionaryEntry);
++  }
++}
+ 
+ Dictionary::Dictionary(int table_size)
+-  : TwoOopHashtable<Klass*, mtClass>(table_size, sizeof(DictionaryEntry)) {
++  : TwoOopHashtable<Klass*, mtClass>(table_size, (int)entry_size()) {
+   _current_class_index = 0;
+   _current_class_entry = NULL;
+   _pd_cache_table = new ProtectionDomainCacheTable(defaultProtectionDomainCacheSize);
+@@ -47,7 +55,7 @@
+ 
+ Dictionary::Dictionary(int table_size, HashtableBucket<mtClass>* t,
+                        int number_of_entries)
+-  : TwoOopHashtable<Klass*, mtClass>(table_size, sizeof(DictionaryEntry), t, number_of_entries) {
++  : TwoOopHashtable<Klass*, mtClass>(table_size, (int)entry_size(), t, number_of_entries) {
+   _current_class_index = 0;
+   _current_class_entry = NULL;
+   _pd_cache_table = new ProtectionDomainCacheTable(defaultProtectionDomainCacheSize);
+@@ -63,6 +71,9 @@
+   entry->set_loader_data(loader_data);
+   entry->set_pd_set(NULL);
+   assert(klass->oop_is_instance(), "Must be");
++  if (DumpSharedSpaces) {
++    SystemDictionaryShared::init_shared_dictionary_entry(klass, entry);
++  }
+   return entry;
+ }
+ 
+diff --git openjdk/hotspot/src/share/vm/classfile/dictionary.hpp openjdk/hotspot/src/share/vm/classfile/dictionary.hpp
+--- openjdk/hotspot/src/share/vm/classfile/dictionary.hpp
++++ openjdk/hotspot/src/share/vm/classfile/dictionary.hpp
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 2003, 2014, Oracle and/or its affiliates. All rights reserved.
++ * Copyright (c) 2003, 2016, Oracle and/or its affiliates. All rights reserved.
+  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+  *
+  * This code is free software; you can redistribute it and/or modify it
+@@ -53,6 +53,7 @@
+   DictionaryEntry* get_entry(int index, unsigned int hash,
+                              Symbol* name, ClassLoaderData* loader_data);
+ 
++protected:
+   DictionaryEntry* bucket(int i) {
+     return (DictionaryEntry*)Hashtable<Klass*, mtClass>::bucket(i);
+   }
+@@ -66,6 +67,8 @@
+     Hashtable<Klass*, mtClass>::add_entry(index, (HashtableEntry<Klass*, mtClass>*)new_entry);
+   }
+ 
++  static size_t entry_size();
++
+ public:
+   Dictionary(int table_size);
+   Dictionary(int table_size, HashtableBucket<mtClass>* t, int number_of_entries);
+diff --git openjdk/hotspot/src/share/vm/classfile/systemDictionary.cpp openjdk/hotspot/src/share/vm/classfile/systemDictionary.cpp
+--- openjdk/hotspot/src/share/vm/classfile/systemDictionary.cpp
++++ openjdk/hotspot/src/share/vm/classfile/systemDictionary.cpp
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 1997, 2014, Oracle and/or its affiliates. All rights reserved.
++ * Copyright (c) 1997, 2016, Oracle and/or its affiliates. All rights reserved.
+  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+  *
+  * This code is free software; you can redistribute it and/or modify it
+@@ -1198,8 +1198,13 @@
+ 
+     if (ik->super() != NULL) {
+       Symbol*  cn = ik->super()->name();
+-      resolve_super_or_fail(class_name, cn,
+-                            class_loader, protection_domain, true, CHECK_(nh));
++      Klass *s = resolve_super_or_fail(class_name, cn,
++                                       class_loader, protection_domain, true, CHECK_(nh));
++      if (s != ik->super()) {
++        // The dynamically resolved super class is not the same as the one we used during dump time,
++        // so we cannot use ik.
++        return nh;
++      }
+     }
+ 
+     Array<Klass*>* interfaces = ik->local_interfaces();
+@@ -1212,7 +1217,12 @@
+       // reinitialized yet (they will be once the interface classes
+       // are loaded)
+       Symbol*  name  = k->name();
+-      resolve_super_or_fail(class_name, name, class_loader, protection_domain, false, CHECK_(nh));
++      Klass* i = resolve_super_or_fail(class_name, name, class_loader, protection_domain, false, CHECK_(nh));
++      if (k != i) {
++        // The dynamically resolved interface class is not the same as the one we used during dump time,
++        // so we cannot use ik.
++        return nh;
++      }
+     }
+ 
+     // Adjust methods to recover missing data.  They need addresses for
+diff --git openjdk/hotspot/src/share/vm/classfile/systemDictionaryShared.hpp openjdk/hotspot/src/share/vm/classfile/systemDictionaryShared.hpp
+--- openjdk/hotspot/src/share/vm/classfile/systemDictionaryShared.hpp
++++ openjdk/hotspot/src/share/vm/classfile/systemDictionaryShared.hpp
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
++ * Copyright (c) 2014, 2016, Oracle and/or its affiliates. All rights reserved.
+  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+  *
+  * This code is free software; you can redistribute it and/or modify it
+@@ -26,6 +26,7 @@
+ #ifndef SHARE_VM_CLASSFILE_SYSTEMDICTIONARYSHARED_HPP
+ #define SHARE_VM_CLASSFILE_SYSTEMDICTIONARYSHARED_HPP
+ 
++#include "classfile/dictionary.hpp"
+ #include "classfile/systemDictionary.hpp"
+ 
+ class SystemDictionaryShared: public SystemDictionary {
+@@ -42,6 +43,22 @@
+     oop class_loader = loader_data->class_loader();
+     return (class_loader == NULL);
+   }
++
++  static size_t dictionary_entry_size() {
++    return sizeof(DictionaryEntry);
++  }
++  static void init_shared_dictionary_entry(Klass* k, DictionaryEntry* entry) {}
++
++  // The (non-application) CDS implementation supports only classes in the boot
++  // class loader, which ensures that the verification dependencies are the same
++  // during archive creation time and runtime. Thus we can do the dependency checks
++  // entirely during archive creation time.
++  static void add_verification_dependency(Klass* k, Symbol* accessor_clsname,
++                                          Symbol* target_clsname) {}
++  static void finalize_verification_dependencies() {}
++  static bool check_verification_dependencies(Klass* k, Handle class_loader,
++                                              Handle protection_domain,
++                                              char** message_buffer, TRAPS) {return true;}
+ };
+ 
+ #endif // SHARE_VM_CLASSFILE_SYSTEMDICTIONARYSHARED_HPP
+diff --git openjdk/hotspot/src/share/vm/classfile/verificationType.cpp openjdk/hotspot/src/share/vm/classfile/verificationType.cpp
+--- openjdk/hotspot/src/share/vm/classfile/verificationType.cpp
++++ openjdk/hotspot/src/share/vm/classfile/verificationType.cpp
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 2003, 2014, Oracle and/or its affiliates. All rights reserved.
++ * Copyright (c) 2003, 2016, Oracle and/or its affiliates. All rights reserved.
+  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+  *
+  * This code is free software; you can redistribute it and/or modify it
+@@ -24,6 +24,7 @@
+ 
+ #include "precompiled.hpp"
+ #include "classfile/symbolTable.hpp"
++#include "classfile/systemDictionaryShared.hpp"
+ #include "classfile/verificationType.hpp"
+ #include "classfile/verifier.hpp"
+ 
+@@ -73,7 +74,23 @@
+       Klass* from_class = SystemDictionary::resolve_or_fail(
+           from.name(), Handle(THREAD, klass->class_loader()),
+           Handle(THREAD, klass->protection_domain()), true, CHECK_false);
+-      return InstanceKlass::cast(from_class)->is_subclass_of(this_class());
++      bool result = InstanceKlass::cast(from_class)->is_subclass_of(this_class());
++      if (result && DumpSharedSpaces) {
++        if (klass()->is_subclass_of(from_class) && klass()->is_subclass_of(this_class())) {
++          // No need to save verification dependency. At run time, <klass> will be
++          // loaded from the archived only if <from_class> and <this_class> are
++          // also loaded from the archive. I.e., all 3 classes are exactly the same
++          // as we saw at archive creation time.
++        } else {
++          // Save the dependency. At run time, we need to check that the condition
++          // from_class->is_subclass_of(this_class() is still true.
++          Symbol* accessor_clsname = from.name();
++          Symbol* target_clsname = this_class()->name();
++          SystemDictionaryShared::add_verification_dependency(klass(),
++                       accessor_clsname, target_clsname);
++        }
++      }
++      return result;
+     }
+   } else if (is_array() && from.is_array()) {
+     VerificationType comp_this = get_component(context, CHECK_false);
+diff --git openjdk/hotspot/src/share/vm/memory/metaspaceShared.cpp openjdk/hotspot/src/share/vm/memory/metaspaceShared.cpp
+--- openjdk/hotspot/src/share/vm/memory/metaspaceShared.cpp
++++ openjdk/hotspot/src/share/vm/memory/metaspaceShared.cpp
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 2012, 2014, Oracle and/or its affiliates. All rights reserved.
++ * Copyright (c) 2012, 2016, Oracle and/or its affiliates. All rights reserved.
+  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+  *
+  * This code is free software; you can redistribute it and/or modify it
+@@ -30,6 +30,7 @@
+ #include "classfile/sharedClassUtil.hpp"
+ #include "classfile/symbolTable.hpp"
+ #include "classfile/systemDictionary.hpp"
++#include "classfile/systemDictionaryShared.hpp"
+ #include "code/codeCache.hpp"
+ #include "memory/filemap.hpp"
+ #include "memory/gcLocker.hpp"
+@@ -684,6 +685,10 @@
+       exit(1);
+     }
+   }
++
++  // Copy the dependencies from C_HEAP-alloced GrowableArrays to RO-alloced
++  // Arrays
++  SystemDictionaryShared::finalize_verification_dependencies();
+ }
+ 
+ void MetaspaceShared::prepare_for_dumping() {
+diff --git openjdk/hotspot/src/share/vm/oops/instanceKlass.cpp openjdk/hotspot/src/share/vm/oops/instanceKlass.cpp
+--- openjdk/hotspot/src/share/vm/oops/instanceKlass.cpp
++++ openjdk/hotspot/src/share/vm/oops/instanceKlass.cpp
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 1997, 2015, Oracle and/or its affiliates. All rights reserved.
++ * Copyright (c) 1997, 2016, Oracle and/or its affiliates. All rights reserved.
+  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+  *
+  * This code is free software; you can redistribute it and/or modify it
+@@ -25,6 +25,7 @@
+ #include "precompiled.hpp"
+ #include "classfile/javaClasses.hpp"
+ #include "classfile/systemDictionary.hpp"
++#include "classfile/systemDictionaryShared.hpp"
+ #include "classfile/verifier.hpp"
+ #include "classfile/vmSymbols.hpp"
+ #include "compiler/compileBroker.hpp"
+@@ -706,6 +707,16 @@
+ 
+         // also sets rewritten
+         this_oop->rewrite_class(CHECK_false);
++      } else if (this_oop()->is_shared()) {
++        ResourceMark rm(THREAD);
++        char* message_buffer; // res-allocated by check_verification_dependencies
++        Handle loader = this_oop()->class_loader();
++        Handle pd     = this_oop()->protection_domain();
++        bool verified = SystemDictionaryShared::check_verification_dependencies(this_oop(),
++                        loader, pd, &message_buffer, THREAD);
++        if (!verified) {
++          THROW_MSG_(vmSymbols::java_lang_VerifyError(), message_buffer, false);
++        }
+       }
+ 
+       // relocate jsrs and link methods after they are all rewritten
+diff --git openjdk/hotspot/src/share/vm/prims/whitebox.cpp openjdk/hotspot/src/share/vm/prims/whitebox.cpp
+--- openjdk/hotspot/src/share/vm/prims/whitebox.cpp
++++ openjdk/hotspot/src/share/vm/prims/whitebox.cpp
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 2012, 2014, Oracle and/or its affiliates. All rights reserved.
++ * Copyright (c) 2012, 2016, Oracle and/or its affiliates. All rights reserved.
+  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+  *
+  * This code is free software; you can redistribute it and/or modify it
+@@ -25,6 +25,7 @@
+ #include "precompiled.hpp"
+ 
+ #include "memory/metadataFactory.hpp"
++#include "memory/metaspaceShared.hpp"
+ #include "memory/universe.hpp"
+ #include "oops/oop.inline.hpp"
+ 
+@@ -914,6 +915,10 @@
+   return (jlong) MetaspaceGC::capacity_until_GC();
+ WB_END
+ 
++WB_ENTRY(jboolean, WB_IsSharedClass(JNIEnv* env, jobject wb, jclass clazz))
++  return (jboolean)MetaspaceShared::is_in_shared_space(java_lang_Class::as_Klass(JNIHandles::resolve_non_null(clazz)));
++WB_END
++
+ WB_ENTRY(jboolean, WB_IsMonitorInflated(JNIEnv* env, jobject wb, jobject obj))
+   oop obj_oop = JNIHandles::resolve(obj);
+   return (jboolean) obj_oop->mark()->has_monitor();
+@@ -1034,6 +1039,7 @@
+   {CC"runMemoryUnitTests", CC"()V",                   (void*)&WB_RunMemoryUnitTests},
+   {CC"readFromNoaccessArea",CC"()V",                  (void*)&WB_ReadFromNoaccessArea},
+   {CC"stressVirtualSpaceResize",CC"(JJJ)I",           (void*)&WB_StressVirtualSpaceResize},
++  {CC"isSharedClass", CC"(Ljava/lang/Class;)Z",       (void*)&WB_IsSharedClass },
+ #if INCLUDE_ALL_GCS
+   {CC"g1InConcurrentMark", CC"()Z",                   (void*)&WB_G1InConcurrentMark},
+   {CC"g1IsHumongous",      CC"(Ljava/lang/Object;)Z", (void*)&WB_G1IsHumongous     },
+diff --git openjdk/hotspot/test/testlibrary/whitebox/sun/hotspot/WhiteBox.java openjdk/hotspot/test/testlibrary/whitebox/sun/hotspot/WhiteBox.java
+--- openjdk/hotspot/test/testlibrary/whitebox/sun/hotspot/WhiteBox.java
++++ openjdk/hotspot/test/testlibrary/whitebox/sun/hotspot/WhiteBox.java
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 2012, 2015, Oracle and/or its affiliates. All rights reserved.
++ * Copyright (c) 2012, 2016, Oracle and/or its affiliates. All rights reserved.
+  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+  *
+  * This code is free software; you can redistribute it and/or modify it
+@@ -233,4 +233,6 @@
+     return offset;
+   }
+ 
++  // Class Data Sharing
++  public native boolean isSharedClass(Class<?> c);
+ }

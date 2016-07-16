@@ -1,0 +1,367 @@
+# HG changeset patch
+# User jiangli
+# Date 1461782515 14400
+#      Wed Apr 27 14:41:55 2016 -0400
+# Node ID cb4af293fe70549b51039bb9197f373e6750fafb
+# Parent  432c2a4b018eea5bcd3a16a960aa12bf527710f9
+8153312: Constrain AppCDS behavior
+Reviewed-by: iklam, acorn, mschoene
+
+diff --git openjdk/hotspot/src/share/vm/memory/metaspaceShared.cpp openjdk/hotspot/src/share/vm/memory/metaspaceShared.cpp
+--- openjdk/hotspot/src/share/vm/memory/metaspaceShared.cpp
++++ openjdk/hotspot/src/share/vm/memory/metaspaceShared.cpp
+@@ -54,6 +54,7 @@
+ bool MetaspaceShared::_check_classes_made_progress;
+ bool MetaspaceShared::_has_error_classes;
+ bool MetaspaceShared::_archive_loading_failed = false;
++bool MetaspaceShared::_remapped_readwrite = false;
+ // Read/write a data stream for restoring/preserving metadata pointers and
+ // miscellaneous data from/to the shared archive file.
+ 
+@@ -1101,6 +1102,7 @@
+     if (!mapinfo->remap_shared_readonly_as_readwrite()) {
+       return false;
+     }
++    _remapped_readwrite = true;
+   }
+   return true;
+ }
+diff --git openjdk/hotspot/src/share/vm/memory/metaspaceShared.hpp openjdk/hotspot/src/share/vm/memory/metaspaceShared.hpp
+--- openjdk/hotspot/src/share/vm/memory/metaspaceShared.hpp
++++ openjdk/hotspot/src/share/vm/memory/metaspaceShared.hpp
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 2012, Oracle and/or its affiliates. All rights reserved.
++ * Copyright (c) 2012, 2016, Oracle and/or its affiliates. All rights reserved.
+  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+  *
+  * This code is free software; you can redistribute it and/or modify it
+@@ -55,6 +55,7 @@
+   static bool _check_classes_made_progress;
+   static bool _has_error_classes;
+   static bool _archive_loading_failed;
++  static bool _remapped_readwrite;
+  public:
+   enum {
+     vtbl_list_size         = 17,   // number of entries in the shared space vtable list.
+@@ -123,6 +124,10 @@
+   // sharing is enabled. Simply returns true if sharing is not enabled
+   // or if the remapping has already been done by a prior call.
+   static bool remap_shared_readonly_as_readwrite() NOT_CDS_RETURN_(true);
++  static bool remapped_readwrite() {
++    CDS_ONLY(return _remapped_readwrite);
++    NOT_CDS(return false);
++  }
+ 
+   static void print_shared_spaces();
+ 
+diff --git openjdk/hotspot/src/share/vm/oops/instanceKlass.cpp openjdk/hotspot/src/share/vm/oops/instanceKlass.cpp
+--- openjdk/hotspot/src/share/vm/oops/instanceKlass.cpp
++++ openjdk/hotspot/src/share/vm/oops/instanceKlass.cpp
+@@ -726,7 +726,12 @@
+       // methods have been rewritten since rewrite may
+       // fabricate new Method*s.
+       // also does loader constraint checking
+-      if (!this_oop()->is_shared()) {
++      //
++      // Initialize_vtable and initialize_itable need to be rerun for
++      // a shared class if the class is not loaded by the NULL classloader.
++      ClassLoaderData * loader_data = this_oop->class_loader_data();
++      if (!(this_oop()->is_shared() &&
++            loader_data->is_the_null_class_loader_data())) {
+         ResourceMark rm(THREAD);
+         this_oop->vtable()->initialize_vtable(true, CHECK_false);
+         this_oop->itable()->initialize_itable(true, CHECK_false);
+diff --git openjdk/hotspot/src/share/vm/oops/klassVtable.cpp openjdk/hotspot/src/share/vm/oops/klassVtable.cpp
+--- openjdk/hotspot/src/share/vm/oops/klassVtable.cpp
++++ openjdk/hotspot/src/share/vm/oops/klassVtable.cpp
+@@ -27,6 +27,7 @@
+ #include "classfile/vmSymbols.hpp"
+ #include "gc_implementation/shared/markSweep.inline.hpp"
+ #include "memory/gcLocker.hpp"
++#include "memory/metaspaceShared.hpp"
+ #include "memory/resourceArea.hpp"
+ #include "memory/universe.inline.hpp"
+ #include "oops/instanceKlass.hpp"
+@@ -47,6 +48,10 @@
+   return (InstanceKlass*)k;
+ }
+ 
++bool klassVtable::is_preinitialized_vtable() {
++  return _klass->is_shared() && !MetaspaceShared::remapped_readwrite();
++}
++
+ 
+ // this function computes the vtable size (including the size needed for miranda
+ // methods) and the number of miranda methods in this class.
+@@ -128,6 +133,12 @@
+ int klassVtable::initialize_from_super(KlassHandle super) {
+   if (super.is_null()) {
+     return 0;
++  } else if (is_preinitialized_vtable()) {
++    // A shared class' vtable is preinitialized at dump time. No need to copy
++    // methods from super class for shared class, as that was already done
++    // during archiving time. However, if Jvmti has redefined a class,
++    // copy super class's vtable in case the super class has changed.
++    return super->vtable()->length();
+   } else {
+     // copy methods from superKlass
+     // can't inherit from array class, so must be InstanceKlass
+@@ -157,6 +168,8 @@
+   KlassHandle super (THREAD, klass()->java_super());
+   int nofNewEntries = 0;
+ 
++  bool is_shared = _klass->is_shared();
++
+   if (PrintVtables && !klass()->oop_is_array()) {
+     ResourceMark rm(THREAD);
+     tty->print_cr("Initializing: %s", _klass->name()->as_C_string());
+@@ -169,6 +182,7 @@
+ #endif
+ 
+   if (Universe::is_bootstrapping()) {
++    assert(!is_shared, "sanity");
+     // just clear everything
+     for (int i = 0; i < _length; i++) table()[i].clear();
+     return;
+@@ -208,6 +222,7 @@
+       if (len > 0) {
+         Array<int>* def_vtable_indices = NULL;
+         if ((def_vtable_indices = ik()->default_vtable_indices()) == NULL) {
++          assert(!is_shared, "shared class def_vtable_indices does not exist");
+           def_vtable_indices = ik()->create_new_default_vtable_indices(len, CHECK);
+         } else {
+           assert(def_vtable_indices->length() == len, "reinit vtable len?");
+@@ -222,7 +237,15 @@
+           // needs new entry
+           if (needs_new_entry) {
+             put_method_at(mh(), initialized);
+-            def_vtable_indices->at_put(i, initialized); //set vtable index
++            if (is_preinitialized_vtable()) {
++              // At runtime initialize_vtable is rerun for a shared class
++              // (loaded by the non-boot loader) as part of link_class_impl().
++              // The dumptime vtable index should be the same as the runtime index.
++              assert(def_vtable_indices->at(i) == initialized,
++                     "dump time vtable index is different from runtime index");
++            } else {
++              def_vtable_indices->at_put(i, initialized); //set vtable index
++            }
+             initialized++;
+           }
+         }
+@@ -365,7 +388,8 @@
+   }
+ 
+   // we need a new entry if there is no superclass
+-  if (klass->super() == NULL) {
++  Klass* super = klass->super();
++  if (super == NULL) {
+     return allocate_new;
+   }
+ 
+@@ -394,7 +418,15 @@
+ 
+   Symbol* target_classname = target_klass->name();
+   for(int i = 0; i < super_vtable_len; i++) {
+-    Method* super_method = method_at(i);
++    Method* super_method;
++    if (is_preinitialized_vtable()) {
++      // If this is a shared class, the vtable is already in the final state (fully
++      // initialized). Need to look at the super's vtable.
++      klassVtable* superVtable = super->vtable();
++      super_method = superVtable->method_at(i);
++    } else {
++      super_method = method_at(i);
++    }
+     // Check if method name matches
+     if (super_method->name() == name && super_method->signature() == signature) {
+ 
+@@ -458,7 +490,15 @@
+          target_method()->set_vtable_index(i);
+        } else {
+          if (def_vtable_indices != NULL) {
+-           def_vtable_indices->at_put(default_index, i);
++           if (is_preinitialized_vtable()) {
++             // At runtime initialize_vtable is rerun as part of link_class_impl()
++             // for a shared class loaded by the non-boot loader.
++             // The dumptime vtable index should be the same as the runtime index.
++             assert(def_vtable_indices->at(default_index) == i,
++                    "dump time vtable index is different from runtime index");
++           } else {
++             def_vtable_indices->at_put(default_index, i);
++           }
+          }
+          assert(super_method->is_default_method() || super_method->is_overpass()
+                 || super_method->is_abstract(), "default override error");
+@@ -523,24 +563,33 @@
+ }
+ 
+ void klassVtable::put_method_at(Method* m, int index) {
++  if (is_preinitialized_vtable()) {
++    // At runtime initialize_vtable is rerun as part of link_class_impl()
++    // for shared class loaded by the non-boot loader to obtain the loader
++    // constraints based on the runtime classloaders' context. The dumptime
++    // method at the vtable index should be the same as the runtime method.
++    assert(table()[index].method() == m,
++           "archived method is different from the runtime method");
++  } else {
+ #ifndef PRODUCT
+-  if (PrintVtables && Verbose) {
+-    ResourceMark rm;
+-    const char* sig = (m != NULL) ? m->name_and_sig_as_C_string() : "<NULL>";
+-    tty->print("adding %s at index %d, flags: ", sig, index);
+-    if (m != NULL) {
+-      m->access_flags().print_on(tty);
+-      if (m->is_default_method()) {
+-        tty->print("default ");
++    if (PrintVtables && Verbose) {
++      ResourceMark rm;
++      const char* sig = (m != NULL) ? m->name_and_sig_as_C_string() : "<NULL>";
++      tty->print("adding %s at index %d, flags: ", sig, index);
++      if (m != NULL) {
++        m->access_flags().print_on(tty);
++        if (m->is_default_method()) {
++          tty->print("default ");
++        }
++        if (m->is_overpass()) {
++          tty->print("overpass");
++        }
+       }
+-      if (m->is_overpass()) {
+-        tty->print("overpass");
+-      }
++      tty->cr();
+     }
+-    tty->cr();
++#endif
++    table()[index].set(m);
+   }
+-#endif
+-  table()[index].set(m);
+ }
+ 
+ // Find out if a method "m" with superclass "super", loader "classloader" and
+@@ -971,7 +1020,15 @@
+ void itableMethodEntry::initialize(Method* m) {
+   if (m == NULL) return;
+ 
+-  _method = m;
++  if (MetaspaceShared::is_in_shared_space((void*)&_method) &&
++     !MetaspaceShared::remapped_readwrite()) {
++    // At runtime initialize_itable is rerun as part of link_class_impl()
++    // for a shared class loaded by the non-boot loader.
++    // The dumptime itable method entry should be the same as the runtime entry.
++    assert(_method == m, "sanity");
++  } else {
++    _method = m;
++  }
+ }
+ 
+ klassItable::klassItable(instanceKlassHandle klass) {
+@@ -1081,7 +1138,11 @@
+         tty->cr();
+       }
+       if (!m->has_vtable_index()) {
+-        assert(m->vtable_index() == Method::pending_itable_index, "set by initialize_vtable");
++        // A shared method could have an initialized itable_index that
++        // is < 0.
++        assert(m->vtable_index() == Method::pending_itable_index ||
++               m->is_shared(),
++               "set by initialize_vtable");
+         m->set_itable_index(ime_num);
+         // Progress to next itable entry
+         ime_num++;
+@@ -1277,7 +1338,6 @@
+ }
+ #endif // INCLUDE_JVMTI
+ 
+-
+ // Setup
+ class InterfaceVisiterClosure : public StackObj {
+  public:
+diff --git openjdk/hotspot/src/share/vm/oops/klassVtable.hpp openjdk/hotspot/src/share/vm/oops/klassVtable.hpp
+--- openjdk/hotspot/src/share/vm/oops/klassVtable.hpp
++++ openjdk/hotspot/src/share/vm/oops/klassVtable.hpp
+@@ -142,6 +142,19 @@
+       Array<Klass*>* local_interfaces);
+   void verify_against(outputStream* st, klassVtable* vt, int index);
+   inline InstanceKlass* ik() const;
++  // When loading a class from CDS archive at run time, and no class redefintion
++  // has happened, it is expected that the class's itable/vtables are
++  // laid out exactly the same way as they had been during dump time.
++  // Therefore, in klassVtable::initialize_[iv]table, we do not layout the
++  // tables again. Instead, we only rerun the process to create/check
++  // the class loader constraints. In non-product builds, we add asserts to
++  // guarantee that the table's layout would be the same as at dump time.
++  //
++  // If JVMTI redefines any class, the read-only shared memory are remapped
++  // as read-write. A shared class' vtable/itable are re-initialized and
++  // might have different layout due to class redefinition of the shared class
++  // or its super types.
++  bool is_preinitialized_vtable();
+ };
+ 
+ 
+diff --git openjdk/hotspot/src/share/vm/oops/method.cpp openjdk/hotspot/src/share/vm/oops/method.cpp
+--- openjdk/hotspot/src/share/vm/oops/method.cpp
++++ openjdk/hotspot/src/share/vm/oops/method.cpp
+@@ -36,6 +36,7 @@
+ #include "memory/generation.hpp"
+ #include "memory/heapInspection.hpp"
+ #include "memory/metadataFactory.hpp"
++#include "memory/metaspaceShared.hpp"
+ #include "memory/oopFactory.hpp"
+ #include "oops/constMethod.hpp"
+ #include "oops/methodData.hpp"
+@@ -305,6 +306,33 @@
+   unlink_method();
+ }
+ 
++void Method::set_vtable_index(int index) {
++  if (is_shared() && !MetaspaceShared::remapped_readwrite()) {
++    // At runtime initialize_vtable is rerun as part of link_class_impl()
++    // for a shared class loaded by the non-boot loader to obtain the loader
++    // constraints based on the runtime classloaders' context.
++    return; // don't write into the shared class
++  } else {
++    _vtable_index = index;
++  }
++}
++
++void Method::set_itable_index(int index) {
++  if (is_shared() && !MetaspaceShared::remapped_readwrite()) {
++    // At runtime initialize_itable is rerun as part of link_class_impl()
++    // for a shared class loaded by the non-boot loader to obtain the loader
++    // constraints based on the runtime classloaders' context. The dumptime
++    // itable index should be the same as the runtime index.
++    assert(_vtable_index == itable_index_max - index,
++           "archived itable index is different from runtime index");
++    return; // don’t write into the shared class
++  } else {
++    _vtable_index = itable_index_max - index;
++  }
++  assert(valid_itable_index(), "");
++}
++
++
+ 
+ bool Method::was_executed_more_than(int n) {
+   // Invocation counter is reset when the Method* is compiled.
+diff --git openjdk/hotspot/src/share/vm/oops/method.hpp openjdk/hotspot/src/share/vm/oops/method.hpp
+--- openjdk/hotspot/src/share/vm/oops/method.hpp
++++ openjdk/hotspot/src/share/vm/oops/method.hpp
+@@ -471,12 +471,12 @@
+   DEBUG_ONLY(bool valid_vtable_index() const     { return _vtable_index >= nonvirtual_vtable_index; })
+   bool has_vtable_index() const                  { return _vtable_index >= 0; }
+   int  vtable_index() const                      { return _vtable_index; }
+-  void set_vtable_index(int index)               { _vtable_index = index; }
++  void set_vtable_index(int index);
+   DEBUG_ONLY(bool valid_itable_index() const     { return _vtable_index <= pending_itable_index; })
+   bool has_itable_index() const                  { return _vtable_index <= itable_index_max; }
+   int  itable_index() const                      { assert(valid_itable_index(), "");
+                                                    return itable_index_max - _vtable_index; }
+-  void set_itable_index(int index)               { _vtable_index = itable_index_max - index; assert(valid_itable_index(), ""); }
++  void set_itable_index(int index);
+ 
+   // interpreter entry
+   address interpreter_entry() const              { return _i2i_entry; }
