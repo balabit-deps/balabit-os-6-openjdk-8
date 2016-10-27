@@ -118,7 +118,7 @@ Index: b/hotspot/src/os/linux/vm/os_linux.cpp
  }
  
  julong os::physical_memory() {
-@@ -2171,18 +2191,22 @@ void os::print_memory_info(outputStream*
+@@ -2174,18 +2194,22 @@ void os::print_memory_info(outputStream*
    st->print("Memory:");
    st->print(" %dk page", os::vm_page_size()>>10);
  
@@ -448,7 +448,7 @@ Index: b/hotspot/make/defs.make
 ===================================================================
 --- a/hotspot/make/defs.make
 +++ b/hotspot/make/defs.make
-@@ -167,9 +167,6 @@ endif
+@@ -179,9 +179,6 @@ endif
  # Windows should have OS predefined
  ifeq ($(OS),)
    OS   := $(shell uname -s)
@@ -458,7 +458,7 @@ Index: b/hotspot/make/defs.make
    ifeq ($(OS), Darwin)
      OS=bsd
    endif
-@@ -195,6 +192,10 @@ else
+@@ -207,6 +204,10 @@ else
    OSNAME=linux
  endif
  
@@ -473,7 +473,7 @@ Index: b/hotspot/make/linux/Makefile
 ===================================================================
 --- a/hotspot/make/linux/Makefile
 +++ b/hotspot/make/linux/Makefile
-@@ -232,6 +232,9 @@ checks: check_os_version check_j2se_vers
+@@ -236,6 +236,9 @@ checks: check_os_version check_j2se_vers
  SUPPORTED_OS_VERSION = 2.4% 2.5% 2.6% 3% 4%
  OS_VERSION := $(shell uname -r)
  EMPTY_IF_NOT_SUPPORTED = $(filter $(SUPPORTED_OS_VERSION),$(OS_VERSION))
@@ -487,18 +487,24 @@ Index: b/hotspot/make/linux/makefiles/defs.make
 ===================================================================
 --- a/hotspot/make/linux/makefiles/defs.make
 +++ b/hotspot/make/linux/makefiles/defs.make
-@@ -102,9 +102,9 @@ ifneq (,$(findstring $(ARCH), amd64 x86_
+@@ -84,7 +84,7 @@ ifneq (,$(findstring $(ARCH), sparc))
  endif
  
- # i686/i586 ie 32-bit x86
--ifneq (,$(findstring $(ARCH), i686 i586))
-+ifneq (,$(filter $(ARCH), i686 i586 i486 i386))
-   ARCH_DATA_MODEL  = 32
--  PLATFORM         = linux-i586
-+  PLATFORM         = linux_i486
-   VM_PLATFORM      = linux_i486
-   HS_ARCH          = x86
- endif
+ # i686/i586 and amd64/x86_64
+-ifneq (,$(findstring $(ARCH), amd64 x86_64 i686 i586))
++ifneq (,$(findstring $(ARCH), amd64 x86_64 i686 i586 i486 i386))
+   ifeq ($(ARCH_DATA_MODEL), 64)
+     ARCH_DATA_MODEL = 64
+     MAKE_ARGS       += LP64=1
+@@ -92,7 +92,7 @@ ifneq (,$(findstring $(ARCH), amd64 x86_
+     VM_PLATFORM     = linux_amd64
+   else
+     ARCH_DATA_MODEL = 32
+-    PLATFORM        = linux-i586
++    PLATFORM        = linux_i486
+     VM_PLATFORM     = linux_i486
+   endif
+   HS_ARCH           = x86
 Index: b/hotspot/agent/src/os/linux/ps_core.c
 ===================================================================
 --- a/hotspot/agent/src/os/linux/ps_core.c
@@ -687,16 +693,16 @@ Index: b/hotspot/agent/src/os/linux/ps_proc.c
 @@ -216,7 +266,11 @@ static bool ptrace_waitpid(pid_t pid) {
  
  // attach to a process/thread specified by "pid"
- static bool ptrace_attach(pid_t pid) {
+ static bool ptrace_attach(pid_t pid, char* err_buf, size_t err_buf_len) {
 +#if defined(__FreeBSD_kernel__)
 +  if (ptrace(PTRACE_ATTACH, pid, NULL, 0) < 0) {
 +#else
    if (ptrace(PTRACE_ATTACH, pid, NULL, NULL) < 0) {
 +#endif
-     print_debug("ptrace(PTRACE_ATTACH, ..) failed for %d\n", pid);
-     return false;
-   } else {
-@@ -310,7 +364,11 @@ static bool read_lib_info(struct ps_proc
+     char buf[200];
+     char* msg = strerror_r(errno, buf, sizeof(buf));
+     snprintf(err_buf, err_buf_len, "ptrace(PTRACE_ATTACH, ..) failed for %d: %s", pid, msg);
+@@ -313,7 +367,11 @@ static bool read_lib_info(struct ps_proc
  
  // detach a given pid
  static bool ptrace_detach(pid_t pid) {
@@ -723,7 +729,7 @@ Index: b/hotspot/agent/src/os/linux/libproc.h
  #include "proc_service.h"
  
  #ifdef ALT_SASRCDIR
-@@ -72,6 +76,10 @@ combination of ptrace and /proc calls.
+@@ -73,6 +77,10 @@ combination of ptrace and /proc calls.
  #define user_regs_struct  pt_regs
  #endif
  
@@ -738,7 +744,7 @@ Index: b/hotspot/agent/src/os/linux/LinuxDebuggerLocal.c
 ===================================================================
 --- a/hotspot/agent/src/os/linux/LinuxDebuggerLocal.c
 +++ b/hotspot/agent/src/os/linux/LinuxDebuggerLocal.c
-@@ -364,7 +364,7 @@ JNIEXPORT jlongArray JNICALL Java_sun_jv
+@@ -367,7 +367,7 @@ JNIEXPORT jlongArray JNICALL Java_sun_jv
  
  #ifdef i386
  #define REG_INDEX(reg) sun_jvm_hotspot_debugger_x86_X86ThreadContext_##reg
@@ -747,7 +753,7 @@ Index: b/hotspot/agent/src/os/linux/LinuxDebuggerLocal.c
    regs[REG_INDEX(GS)]  = (uintptr_t) gregs.xgs;
    regs[REG_INDEX(FS)]  = (uintptr_t) gregs.xfs;
    regs[REG_INDEX(ES)]  = (uintptr_t) gregs.xes;
-@@ -380,12 +380,28 @@ JNIEXPORT jlongArray JNICALL Java_sun_jv
+@@ -383,12 +383,28 @@ JNIEXPORT jlongArray JNICALL Java_sun_jv
    regs[REG_INDEX(PC)] = (uintptr_t) gregs.eip;
    regs[REG_INDEX(CS)]  = (uintptr_t) gregs.xcs;
    regs[REG_INDEX(SS)]  = (uintptr_t) gregs.xss;
@@ -778,7 +784,7 @@ Index: b/hotspot/agent/src/os/linux/LinuxDebuggerLocal.c
    regs[REG_INDEX(R15)] = gregs.r15;
    regs[REG_INDEX(R14)] = gregs.r14;
    regs[REG_INDEX(R13)] = gregs.r13;
-@@ -411,7 +427,27 @@ JNIEXPORT jlongArray JNICALL Java_sun_jv
+@@ -414,7 +430,27 @@ JNIEXPORT jlongArray JNICALL Java_sun_jv
    regs[REG_INDEX(ES)] = gregs.es;
    regs[REG_INDEX(FS)] = gregs.fs;
    regs[REG_INDEX(GS)] = gregs.gs;
@@ -807,9 +813,11 @@ Index: b/hotspot/agent/src/os/linux/LinuxDebuggerLocal.c
  #endif /* amd64 */
  
  #if defined(sparc) || defined(sparcv9)
+Index: b/hotspot/make/linux/makefiles/saproc.make
+===================================================================
 --- a/hotspot/make/linux/makefiles/saproc.make
 +++ b/hotspot/make/linux/makefiles/saproc.make
-@@ -90,6 +90,7 @@
+@@ -90,6 +90,7 @@ $(LIBSAPROC): $(SASRCFILES) $(SAMAPFILE)
  	           -I$(GENERATED)                                       \
  	           -I$(BOOT_JAVA_HOME)/include                          \
  	           -I$(BOOT_JAVA_HOME)/include/$(Platform_os_family)    \

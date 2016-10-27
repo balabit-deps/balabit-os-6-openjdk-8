@@ -5,7 +5,6 @@ tarballs="corba.tar.gz hotspot.tar.gz jaxp.tar.gz jaxws.tar.gz jdk.tar.gz langto
 aarch64_hsname=f50993b6c38d
 tarballs="$tarballs $aarch64_hsname.tar.gz"
 jamvmtb=jamvm-ac22c9948434e528ece451642b4ebde40953ee7e.tar.gz
-cacaotb=cacao-e215e36be9fc.tar.gz
 tarballdir=7u55
 version=7u55-2.4.7
 base=openjdk-7
@@ -42,9 +41,6 @@ else
         for i in $tarballs; do
             cp -p $tarballdir/$i $pkgdir.orig/
         done
-	if [ -n "$cacaotb" ]; then
-          cp -p $tarballdir/$cacaotb $pkgdir.orig/
-	fi
         cp -p $tarballdir/$jamvmtb $pkgdir.orig/
       ;;
     esac

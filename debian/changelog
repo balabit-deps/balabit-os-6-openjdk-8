@@ -1,66 +1,130 @@
-openjdk-8 (8u91-b14-3ubuntu1~16.04.1) xenial-security; urgency=medium
+openjdk-8 (8u111-b14-2ubuntu0.16.04.2) xenial-security; urgency=medium
 
-  * Backport to Ubuntu 16.04.
+  * Backport to 16.04.
 
- -- Tiago Stürmer Daitx <tiago.daitx@canonical.com>  Fri, 16 Jul 2016 15:54:36 +0000
+ -- Tiago Stürmer Daitx <tiago.daitx@canonical.com>  Thu, 27 Oct 2016 14:18:35 +0000
 
-openjdk-8 (8u91-b14-3ubuntu1) yakkety; urgency=medium
+openjdk-8 (8u111-b14-2ubuntu0.16.10.2) yakkety-security; urgency=medium
 
-  * SECURITY UPDATE: IIOP Input Stream Hooking
-    - d/p/corba-8079718.patch: S8079718, CVE-2016-3458: defaultReadObject is
-      not forbidden in readObject in subclasses of InputStreamHook which 
-      provides leverage to deserialize malicious objects if a reference to the
-      input stream can be obtained separately.
-  * SECURITY UPDATE: Complete name checking
-    - d/p/jaxp-8148872.patch: S8148872, CVE-2016-3500: In some cases raw names
-      in XML data are not checked for length limits allowing for DoS attacks.
-  * SECURITY UPDATE: Better delineation of XML processing
-    - d/p/jaxp-8149962.patch: S8149962, CVE-2016-3508: Denial of service
-      measures do not take newline characters into account. This can be used to
-      conduct attacks like the billion laughs DoS.
-  * SECURITY UPDATE: Coded byte streams
-    - d/p/hotspot-8152479.patch: S8152479, CVE-2016-3550: A fuzzed class file
-      triggers an integer overflow in array access.
-  * SECURITY UPDATE: Clean up lookup visibility
-    - d/p/jdk-8154475.patch: S8154475, CVE-2016-3587: A fast path change
-      allowed access to MH.invokeBasic via the public lookup object. MH.iB does
-      not do full type checking which can be used to create type confusion.
-  * SECURITY UPDATE: Bolster bytecode verification
-    - d/p/hotspot-8155981.patch: S8155981, CVE-2016-3606: The bytecode
-      verifier checks that any classes' <init> method calls super.<init> before
-      returning. There is a way to bypass this requirement which allows
-      creating subclasses of classes that are not intended to be extended.
-  * SECURITY UPDATE: Persistent Parameter Processing
-    - d/p/jdk-8155985.patch: S8155985, CVE-2016-3598: TOCTOU issue with types
-      List passed into dropArguments() which can be used to cause type 
-      confusion.
-  * SECURITY UPDATE: Additional method handle validation
-    - d/p/jdk-8158571.patch: S8158571, CVE-2016-3610: MHs.filterReturnValue
-      does not check the filter parameter list size. The single expected
-      parameter is put in the last parameter position for the filter MH
-      allowing for type confusion.
-  * SECURITY UPDATE: Enforce GCM limits
-    - d/p/jdk-8146514.patch: S8146514: In GCM the counter should not be allowed
-      to wrap (per the spec), since that plus exposing the encrypted data could
-      lead to leaking information.
-  * SECURITY UPDATE: Construction of static protection domains
-    - d/p/jdk-8147771.patch: S8147771: SubjectDomainCombiner does not honor the
-      staticPermission field and will create ProtectionDomains that vary with
-      the system policy which may allow unexpected permission sets.
-  * SECURITY UPDATE: Share Class Data
-    - d/p/hotspot-8150752.patch: S8150752: Additional verification of AppCDS
-      archives is required to prevent an attacker from creating a type
-      confusion situation.
-  * SECURITY UPDATE: Enforce update ordering 
-    - d/p/jdk-8149070.patch: S8149070: If the GCM methods update() and
-      updateAAD() are used out of order, the security of the system can be
-      weakened and an exception should be thrown to warn the developer.
-  * SECURITY UPDATE: Constrain AppCDS behavior
-    - d/p/hotspot-8153312.patch: S8153312: AppCDS does not create classloader
-      constraints upon reloading classes which could allow class spoofing under
-      some circumstances.
+  * debian/rules: remove samevm/othervm options from jtreg tests.
+  * debian/buildwatch.sh: noisy and quiet logic blocks were swapped.
 
- -- Tiago Stürmer Daitx <tiago.daitx@canonical.com>  Fri, 15 Jul 2016 18:58:48 +0000
+ -- Tiago Stürmer Daitx <tiago.daitx@canonical.com>  Thu, 27 Oct 2016 14:16:18 +0000
+
+openjdk-8 (8u111-b14-2ubuntu0.16.10.1) yakkety-security; urgency=medium
+
+  * Security fixes in 8u111:
+    - CVE-2016-5568, S8158993: Service Menu services.
+    - CVE-2016-5582, S8160591: Improve internal array handling.
+    - CVE-2016-5573, S8159519: Reformat JDWP messages.
+    - CVE-2016-5597, S8160838: Better HTTP service.
+    - CVE-2016-5554, S8157739: Classloader Consistency Checking.
+    - CVE-2016-5542, S8155973: Tighten jar checks.
+  * debian/rules: removed all mauve and cacao references, updated jtreg tests
+    to use agentvm and auto concurrency, use autoconf 2.68 for precise.
+  * debian/buildwatch.sh: updated to stop it if no 'make' process is running,
+    as it probably means that the build failed - otherwise buildwatch keeps
+    the builder alive until it exits after the timer (3 hours by default)
+    expires.
+  * debian/control.in: removed mauve and cacao references.
+  * debian/copyright.cacao: deleted file.
+  * debian/README.source: removed caco and mauve references.
+  * debian/patches/aarch64.diff: removed cacao vm reference.
+  * debian/patches/autoconf-2.68.diff: reduce minimum autoconf requirement to
+    2.68.
+  * debian/patches/autoconf-select.diff: deleted file as it has been replaced
+    by autoconf 2.68 changes for precise.
+  * debian/patches/cacao-armv4.diff: deleted file.
+  * debian/tests/control: added autopkgtest to run jtreg testsuite.
+  * debian/tests/jtreg-autopkgtest: run jtreg tests on autopkgtest.
+
+ -- Tiago Stürmer Daitx <tiago.daitx@canonical.com>  Thu, 20 Oct 2016 14:16:28 +0000
+
+openjdk-8 (8u111-b14-2) unstable; urgency=high
+
+  * Apply the kfreebsd patches conditionally.
+
+ -- Matthias Klose <doko@ubuntu.com>  Wed, 19 Oct 2016 21:26:28 +0200
+
+openjdk-8 (8u111-b14-1) unstable; urgency=high
+
+  * Update to 8u111-b14, including security fixes.
+  * Enable hotspot builds for sparc64. Closes: #835973.
+
+ -- Matthias Klose <doko@ubuntu.com>  Wed, 19 Oct 2016 19:02:13 +0200
+
+openjdk-8 (8u102-b14.1-2) unstable; urgency=medium
+
+  * Fix build failure with GCC 6. Closes: #811694.
+  * Fix JamVM, lacking JVM_GetResourceLookupCacheURLs (Xerxes Rånby).
+    Closes: #826206.
+  * Explicitly build using GCC 6.
+
+ -- Matthias Klose <doko@ubuntu.com>  Sat, 06 Aug 2016 10:12:09 +0200
+
+openjdk-8 (8u102-b14.1-1) unstable; urgency=medium
+
+  * Use the 8u101 tarballs instead of the 8u102 tarballs (inventing a fake
+    version number).
+
+ -- Matthias Klose <doko@ubuntu.com>  Mon, 01 Aug 2016 16:31:18 +0200
+
+openjdk-8 (8u102-b14-2) unstable; urgency=medium
+
+  * Update AArch64 and KFreeBSD patches.
+
+ -- Matthias Klose <doko@ubuntu.com>  Tue, 26 Jul 2016 13:00:12 +0200
+
+openjdk-8 (8u102-b14-1) unstable; urgency=medium
+
+  * Update to 8u101-b14, including security fixes:
+  * IIOP Input Stream Hooking. CVE-2016-3458:
+    defaultReadObject is not forbidden in readObject in subclasses of
+    InputStreamHook which provides leverage to deserialize malicious objects
+    if a reference to the input stream can be obtained separately.
+  * Complete name checking. S8148872, CVE-2016-3500:
+    In some cases raw names in XML data are not checked for length limits
+    allowing for DoS attacks.
+  * Better delineation of XML processing. S8149962, CVE-2016-3508:
+    Denial of service measures do not take newline characters into account.
+    This can be used to conduct attacks like the billion laughs DoS.
+  * Coded byte streams. S8152479, CVE-2016-3550:
+    A fuzzed class file triggers an integer overflow in array access.
+  * Clean up lookup visibility. S8154475, CVE-2016-3587:
+    A fast path change allowed access to MH.invokeBasic via the public lookup
+    object. MH.iB does not do full type checking which can be used to create
+    type confusion.
+  * Bolster bytecode verification. S8155981, CVE-2016-3606:
+    The bytecode verifier checks that any classes' <init> method calls
+    super.<init> before returning. There is a way to bypass this requirement
+    which allows creating subclasses of classes that are not intended to be
+    extended.
+  * Persistent Parameter Processing. S8155985, CVE-2016-3598:
+    TOCTOU issue with types List passed into dropArguments() which can be used
+    to cause type confusion.
+  * Additional method handle validation. S8158571, CVE-2016-3610:
+    MHs.filterReturnValue does not check the filter parameter list size.
+    The single expected parameter is put in the last parameter position for
+    the filter MH allowing for type confusion.
+  * Enforce GCM limits. S8146514:
+    In GCM the counter should not be allowed to wrap (per the spec), since that
+    plus exposing the encrypted data could lead to leaking information.
+  * Construction of static protection domains. S8147771:
+    SubjectDomainCombiner does not honor the staticPermission field and will
+    create ProtectionDomains that vary with the system policy which may allow
+    unexpected permission sets.
+  * Share Class Data. S8150752:
+    Additional verification of AppCDS archives is required to prevent an
+    attacker from creating a type confusion situation.
+  * Enforce update ordering. S8149070:
+    If the GCM methods update() and updateAAD() are used out of order, the
+    security of the system can be weakened and an exception should be thrown
+    to warn the developer.
+  * Constrain AppCDS behavior. S8153312:
+    AppCDS does not create classloader constraints upon reloading classes
+    which could allow class spoofing under some circumstances.
+
+ -- Matthias Klose <doko@ubuntu.com>  Fri, 24 Jun 2016 14:49:34 +0200
 
 openjdk-8 (8u91-b14-3) unstable; urgency=medium
 
@@ -90,9 +154,9 @@ openjdk-8 (8u91-b14-1) unstable; urgency=high
 
  -- Matthias Klose <doko@ubuntu.com>  Thu, 21 Apr 2016 17:03:22 +0200
 
-openjdk-8 (8u91-b14-0ubuntu4~16.04.1) xenial-security; urgency=medium
+openjdk-8 (8u91-b14-0ubuntu4) xenial; urgency=medium
 
-  * SECURITY UPDATE: Update to 8u91-b14.
+  * Update to 8u91-b14.
     - Addresses CVE-2016-0686 (S8129952), CVE-2016-0687 (S8132051),
       CVE-2016-3427 (S8144430), CVE-2016-0695 (S8138593),
       CVE-2016-3425 (S8143167), CVE-2016-3426 (S8143945).
@@ -100,7 +164,6 @@ openjdk-8 (8u91-b14-0ubuntu4~16.04.1) xenial-security; urgency=medium
   * Add a versioned break to the oracle-java8-installer package.  The
     package inflates the priority of the java alternatives again.  See
     https://lists.ubuntu.com/archives/ubuntu-devel/2016-April/039324.html.
-  * Set initial VMThreadStackSize to 1600 on s390x.
 
  -- Matthias Klose <doko@ubuntu.com>  Thu, 21 Apr 2016 16:25:37 +0200
 

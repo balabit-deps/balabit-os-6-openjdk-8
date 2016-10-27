@@ -3,7 +3,7 @@ Index: b/common/autoconf/generated-configure.sh
 ===================================================================
 --- a/common/autoconf/generated-configure.sh
 +++ b/common/autoconf/generated-configure.sh
-@@ -6887,6 +6887,12 @@ test -n "$target_alias" &&
+@@ -6919,6 +6919,12 @@ test -n "$target_alias" &&
        VAR_CPU_BITS=64
        VAR_CPU_ENDIAN=big
        ;;
@@ -16,7 +16,7 @@ Index: b/common/autoconf/generated-configure.sh
      *)
        as_fn_error $? "unsupported cpu $build_cpu" "$LINENO" 5
        ;;
-@@ -7030,6 +7036,12 @@ $as_echo "$OPENJDK_BUILD_OS-$OPENJDK_BUI
+@@ -7062,6 +7068,12 @@ $as_echo "$OPENJDK_BUILD_OS-$OPENJDK_BUI
        VAR_CPU_BITS=64
        VAR_CPU_ENDIAN=big
        ;;

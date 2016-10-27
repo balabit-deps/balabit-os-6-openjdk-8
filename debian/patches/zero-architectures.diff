@@ -95,7 +95,7 @@ Index: b/common/autoconf/toolchain.m4
 ===================================================================
 --- a/common/autoconf/toolchain.m4
 +++ b/common/autoconf/toolchain.m4
-@@ -1245,6 +1245,8 @@ AC_DEFUN_ONCE([TOOLCHAIN_SETUP_COMPILER_
+@@ -1354,6 +1354,8 @@ AC_DEFUN_ONCE([TOOLCHAIN_SETUP_COMPILER_
      *)
        ZERO_ARCHFLAG="${COMPILER_TARGET_BITS_FLAG}${OPENJDK_TARGET_CPU_BITS}"
    esac

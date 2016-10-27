@@ -24,7 +24,7 @@ Index: b/common/autoconf/generated-configure.sh
 ===================================================================
 --- a/common/autoconf/generated-configure.sh
 +++ b/common/autoconf/generated-configure.sh
-@@ -6836,6 +6836,12 @@ test -n "$target_alias" &&
+@@ -6868,6 +6868,12 @@ test -n "$target_alias" &&
        VAR_CPU_BITS=64
        VAR_CPU_ENDIAN=little
        ;;
@@ -37,7 +37,7 @@ Index: b/common/autoconf/generated-configure.sh
      powerpc)
        VAR_CPU=ppc
        VAR_CPU_ARCH=ppc
-@@ -6973,6 +6979,12 @@ $as_echo "$OPENJDK_BUILD_OS-$OPENJDK_BUI
+@@ -7005,6 +7011,12 @@ $as_echo "$OPENJDK_BUILD_OS-$OPENJDK_BUI
        VAR_CPU_BITS=64
        VAR_CPU_ENDIAN=little
        ;;
@@ -50,7 +50,7 @@ Index: b/common/autoconf/generated-configure.sh
      powerpc)
        VAR_CPU=ppc
        VAR_CPU_ARCH=ppc
-@@ -7943,11 +7955,6 @@ $as_echo "$with_jvm_variants" >&6; }
+@@ -7975,11 +7987,6 @@ $as_echo "$with_jvm_variants" >&6; }
    JVM_VARIANT_ZEROSHARK=`$ECHO "$JVM_VARIANTS" | $SED -e '/,zeroshark,/!s/.*/false/g' -e '/,zeroshark,/s/.*/true/g'`
    JVM_VARIANT_CORE=`$ECHO "$JVM_VARIANTS" | $SED -e '/,core,/!s/.*/false/g' -e '/,core,/s/.*/true/g'`
  
@@ -62,26 +62,16 @@ Index: b/common/autoconf/generated-configure.sh
    if test "x$JVM_VARIANT_KERNEL" = xtrue; then
      if test "x$OPENJDK_TARGET_CPU_BITS" = x64; then
        as_fn_error $? "You cannot build a kernel JVM for a 64-bit machine." "$LINENO" 5
-@@ -7990,6 +7997,9 @@ $as_echo "$with_jvm_variants" >&6; }
-   if test "x$OPENJDK_TARGET_CPU" = xaarch64; then
-     INCLUDE_SA=false
-   fi
-+  if test "x$OPENJDK_TARGET_CPU" = xaarch64; then
-+    INCLUDE_SA=false
-+  fi
- 
- 
-   if test "x$OPENJDK_TARGET_OS" = "xmacosx"; then
-@@ -29667,7 +29677,7 @@ fi
+@@ -29731,7 +29741,7 @@ fi
    #
    case $COMPILER_NAME in
      gcc )
--      CCXXFLAGS_JDK="$CCXXFLAGS $CCXXFLAGS_JDK -W -Wall -Wno-unused -Wno-parentheses \
-+      CCXXFLAGS_JDK="$CCXXFLAGS $CCXXFLAGS_JDK -W -Wall -Wno-unused -Wno-unused-parameter -Wno-parentheses \
+-      COMMON_CCXXFLAGS_JDK="$COMMON_CCXXFLAGS $COMMON_CCXXFLAGS_JDK -W -Wall -Wno-unused -Wno-parentheses \
++      COMMON_CCXXFLAGS_JDK="$COMMON_CCXXFLAGS $COMMON_CCXXFLAGS_JDK -W -Wall -Wno-unused -Wno-unused-parameter -Wno-parentheses \
        -pipe \
        -D_GNU_SOURCE -D_REENTRANT -D_LARGEFILE64_SOURCE"
-       case $OPENJDK_TARGET_CPU_ARCH in
-@@ -29912,6 +29922,9 @@ fi
+       CXXSTD_CXXFLAG="-std=gnu++98"
+@@ -30235,6 +30245,9 @@ $as_echo "$supports" >&6; }
      s390)
        ZERO_ARCHFLAG="${COMPILER_TARGET_BITS_FLAG}31"
        ;;
@@ -126,16 +116,16 @@ Index: b/common/autoconf/toolchain.m4
 ===================================================================
 --- a/common/autoconf/toolchain.m4
 +++ b/common/autoconf/toolchain.m4
-@@ -957,7 +957,7 @@ AC_DEFUN_ONCE([TOOLCHAIN_SETUP_COMPILER_
+@@ -1018,7 +1018,7 @@ AC_DEFUN_ONCE([TOOLCHAIN_SETUP_COMPILER_
    #
    case $COMPILER_NAME in
      gcc )
--      CCXXFLAGS_JDK="$CCXXFLAGS $CCXXFLAGS_JDK -W -Wall -Wno-unused -Wno-parentheses \
-+      CCXXFLAGS_JDK="$CCXXFLAGS $CCXXFLAGS_JDK -W -Wall -Wno-unused -Wno-unused-parameter -Wno-parentheses \
+-      COMMON_CCXXFLAGS_JDK="$COMMON_CCXXFLAGS $COMMON_CCXXFLAGS_JDK -W -Wall -Wno-unused -Wno-parentheses \
++      COMMON_CCXXFLAGS_JDK="$COMMON_CCXXFLAGS $COMMON_CCXXFLAGS_JDK -W -Wall -Wno-unused -Wno-unused-parameter -Wno-parentheses \
        -pipe \
        -D_GNU_SOURCE -D_REENTRANT -D_LARGEFILE64_SOURCE"
-       case $OPENJDK_TARGET_CPU_ARCH in
-@@ -1237,6 +1237,9 @@ AC_DEFUN_ONCE([TOOLCHAIN_SETUP_COMPILER_
+       CXXSTD_CXXFLAG="-std=gnu++98"
+@@ -1346,6 +1346,9 @@ AC_DEFUN_ONCE([TOOLCHAIN_SETUP_COMPILER_
      s390)
        ZERO_ARCHFLAG="${COMPILER_TARGET_BITS_FLAG}31"
        ;;
@@ -189,7 +179,7 @@ Index: b/jdk/src/solaris/bin/aarch64/jvm.cfg
 ===================================================================
 --- /dev/null
 +++ b/jdk/src/solaris/bin/aarch64/jvm.cfg
-@@ -0,0 +1,39 @@
+@@ -0,0 +1,38 @@
 +# Copyright (c) 2011, Oracle and/or its affiliates. All rights reserved.
 +# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
 +#
@@ -225,7 +215,6 @@ Index: b/jdk/src/solaris/bin/aarch64/jvm.cfg
 +# n.b. server must be first so it is used as the default
 +-server KNOWN
 +-minimal ERROR
-+-cacao ERROR
 +-zero KNOWN
 +-shark ERROR
 +-jamvm ERROR

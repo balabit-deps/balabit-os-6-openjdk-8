@@ -6,7 +6,7 @@ Index: b/common/autoconf/generated-configure.sh
 ===================================================================
 --- a/common/autoconf/generated-configure.sh
 +++ b/common/autoconf/generated-configure.sh
-@@ -1066,6 +1066,7 @@ enable_freetype_bundling
+@@ -1071,6 +1071,7 @@ enable_freetype_bundling
  with_alsa
  with_alsa_include
  with_alsa_lib
@@ -14,7 +14,7 @@ Index: b/common/autoconf/generated-configure.sh
  with_giflib
  with_zlib
  with_stdc__lib
-@@ -1839,6 +1840,8 @@ Optional Packages:
+@@ -1844,6 +1845,8 @@ Optional Packages:
                            headers under PATH/include)
    --with-alsa-include     specify directory for the alsa include files
    --with-alsa-lib         specify directory for the alsa library
@@ -23,7 +23,7 @@ Index: b/common/autoconf/generated-configure.sh
    --with-giflib           use giflib from build system or OpenJDK source
                            (system, bundled) [bundled]
    --with-zlib             use zlib from build system or OpenJDK source
-@@ -7955,6 +7958,11 @@ $as_echo "$with_jvm_variants" >&6; }
+@@ -7987,6 +7990,11 @@ $as_echo "$with_jvm_variants" >&6; }
    JVM_VARIANT_ZEROSHARK=`$ECHO "$JVM_VARIANTS" | $SED -e '/,zeroshark,/!s/.*/false/g' -e '/,zeroshark,/s/.*/true/g'`
    JVM_VARIANT_CORE=`$ECHO "$JVM_VARIANTS" | $SED -e '/,core,/!s/.*/false/g' -e '/,core,/s/.*/true/g'`
  
@@ -35,7 +35,7 @@ Index: b/common/autoconf/generated-configure.sh
    if test "x$JVM_VARIANT_KERNEL" = xtrue; then
      if test "x$OPENJDK_TARGET_CPU_BITS" = x64; then
        as_fn_error $? "You cannot build a kernel JVM for a 64-bit machine." "$LINENO" 5
-@@ -34863,10 +34871,43 @@ done
+@@ -35242,10 +35250,43 @@ done
    # Check for the jpeg library
    #
  
@@ -83,7 +83,7 @@ Index: b/common/autoconf/generated-configure.sh
    $as_echo_n "(cached) " >&6
  else
    ac_check_lib_save_LIBS=$LIBS
-@@ -34874,27 +34915,33 @@ LIBS="-ljpeg  $LIBS"
+@@ -35253,27 +35294,33 @@ LIBS="-ljpeg  $LIBS"
  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
  /* end confdefs.h.  */
  
@@ -124,7 +124,7 @@ Index: b/common/autoconf/generated-configure.sh
    cat >>confdefs.h <<_ACEOF
  #define HAVE_LIBJPEG 1
  _ACEOF
-@@ -34902,13 +34949,16 @@ _ACEOF
+@@ -35281,13 +35328,16 @@ _ACEOF
    LIBS="-ljpeg $LIBS"
  
  else

@@ -3,7 +3,6 @@ Content of source package
 "openjdk-8" is a composite source package:
 - Multiple tarballs from each Oracle mercurial repositories :
   corba / hotspot / jaxp / jaxws / jdk-dfsg / langtools / openjdk
-- Tarball from CacaoVM <http://www.cacaovm.org/>.
 - Tarball from JamVM <http://jamvm.sourceforge.net>.
 - Debian packaging scripts and patches.
 
@@ -29,7 +28,7 @@ Pre-requisites:
  mkdir -p $BUILD/
  (
    cd icedtea-2.1.1/
-   sh autogen.sh && ./configure --enable-jamvm --enable-cacao
+   sh autogen.sh && ./configure --enable-jamvm
    make download
  )
  
@@ -56,7 +55,7 @@ As described in Debian Policy §4.9.1, current package's debian/rules support
 the standardized environment variable DEB_BUILD_OPTIONS. This variable can
 contain several flags to change how a package is compiled and built.
 
-  * nocheck: don't run mauve and jtreg test suites.
+  * nocheck: don't run jtreg test suites.
   * nodocs: pass --disable-docs to IcedTea configure script, which
             disable Javadoc generation.
   * nostrip: debugging symbols should not be stripped from the
@@ -64,7 +63,6 @@ contain several flags to change how a package is compiled and built.
   * parallel=X: package should be built using up to X parallel processes
   * nobootstrap: don't use gcj to bootstrap OpenJDK but use existing OpenJDK
                  installed on current machine.
-  * noaltcacao: don't build alternative CACao VM.
   * noaltzero: don't build alternative Zero VM.
   * noaltshark: don't build alternative Shark VM.
   * noaltjamvm: don't build alternative Jamvm VM.
@@ -72,7 +70,7 @@ contain several flags to change how a package is compiled and built.
 Sample usage:
 DEB_BUILD_OPTIONS="parallel=5 nocheck" debuild -i"(\.hg|\.bzr)"
 
- Build with 5 parallel processes and don't run mauve/jtreg test suites.
+ Build with 5 parallel processes and don't run jtreg test suites.
 
 This also work with cowbuilder/pbuilder:
 DEB_BUILD_OPTIONS="parallel=5 nocheck" pdebuild -i"(\.hg|\.bzr)" --logfile ../build.log --pbuilder cowbuilder

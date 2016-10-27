@@ -9,10 +9,11 @@ Summary: Adjust instruction generation.
 Reviewed-by: goetz
 Contributed-by: gromero@linux.vnet.ibm.com, horii@jp.ibm.com
 
-diff -r 4e13df329624 -r 5f3687f2143c src/cpu/ppc/vm/ppc.ad
---- openjdk/hotspot/src/cpu/ppc/vm/ppc.ad	Thu Jun 16 16:41:50 2016 +0000
-+++ openjdk/hotspot/src/cpu/ppc/vm/ppc.ad	Fri Jun 17 11:31:24 2016 +0200
-@@ -5416,7 +5416,7 @@
+Index: b/hotspot/src/cpu/ppc/vm/ppc.ad
+===================================================================
+--- a/hotspot/src/cpu/ppc/vm/ppc.ad
++++ b/hotspot/src/cpu/ppc/vm/ppc.ad
+@@ -5461,7 +5461,7 @@ instruct loadUI2L(iRegLdst dst, memory m
  %}
  
  // Match loading integer and casting it to long.
@@ -21,7 +22,7 @@ diff -r 4e13df329624 -r 5f3687f2143c src/cpu/ppc/vm/ppc.ad
    match(Set dst (ConvI2L (LoadI mem)));
    predicate(_kids[0]->_leaf->as_Load()->is_unordered());
    ins_cost(MEMORY_REF_COST);
-@@ -5432,7 +5432,7 @@
+@@ -5477,7 +5477,7 @@ instruct loadI2L(iRegLdst dst, memory me
  %}
  
  // Match loading integer and casting it to long - acquire.
@@ -30,9 +31,10 @@ diff -r 4e13df329624 -r 5f3687f2143c src/cpu/ppc/vm/ppc.ad
    match(Set dst (ConvI2L (LoadI mem)));
    ins_cost(3*MEMORY_REF_COST);
  
-diff -r 4e13df329624 -r 5f3687f2143c test/compiler/unsafe/JdkInternalMiscUnsafeUnalignedAccess.java
---- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ openjdk/hotspot/test/compiler/unsafe/JdkInternalMiscUnsafeUnalignedAccess.java	Fri Jun 17 11:31:24 2016 +0200
+Index: b/hotspot/test/compiler/unsafe/JdkInternalMiscUnsafeUnalignedAccess.java
+===================================================================
+--- /dev/null
++++ b/hotspot/test/compiler/unsafe/JdkInternalMiscUnsafeUnalignedAccess.java
 @@ -0,0 +1,315 @@
 +/*
 + * Copyright (c) 2016 SAP SE. All rights reserved.
@@ -349,4 +351,3 @@ diff -r 4e13df329624 -r 5f3687f2143c test/compiler/unsafe/JdkInternalMiscUnsafeU
 +    }
 +
 +}
-

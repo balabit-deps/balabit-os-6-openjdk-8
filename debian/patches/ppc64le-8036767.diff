@@ -6,8 +6,8 @@ Index: b/common/autoconf/hotspot-spec.gmk.in
 +++ b/common/autoconf/hotspot-spec.gmk.in
 @@ -71,6 +71,10 @@ ISA_DIR=$(OPENJDK_TARGET_CPU_ISADIR)
  LIBARCH=$(OPENJDK_TARGET_CPU_LEGACY_LIB)
- # Old name for OPENJDK_TARGET_CPU, uses i586 and amd64, instead of x86 and x86_64.
- ARCH=$(OPENJDK_TARGET_CPU_LEGACY)
+ # Set the cpu architecture
+ ARCH=$(OPENJDK_TARGET_CPU_ARCH)
 +# ppc64le uses the HotSpot ppc64 build
 +ifeq ($(OPENJDK_TARGET_CPU), ppc64le)
 +  ARCH=ppc64
@@ -45,15 +45,15 @@ Index: b/common/autoconf/toolchain.m4
 ===================================================================
 --- a/common/autoconf/toolchain.m4
 +++ b/common/autoconf/toolchain.m4
-@@ -1058,6 +1058,9 @@ AC_DEFUN_ONCE([TOOLCHAIN_SETUP_COMPILER_
+@@ -1125,6 +1125,9 @@ AC_DEFUN_ONCE([TOOLCHAIN_SETUP_COMPILER_
    else
-     CCXXFLAGS_JDK="$CCXXFLAGS_JDK -D_BIG_ENDIAN"
+     COMMON_CCXXFLAGS_JDK="$COMMON_CCXXFLAGS_JDK -D_BIG_ENDIAN"
    fi
 +  if test "x$OPENJDK_TARGET_CPU" = xppc64le; then
 +    CCXXFLAGS_JDK="$CCXXFLAGS_JDK -DABI_ELFv2"
 +  fi
    if test "x$OPENJDK_TARGET_OS" = xlinux; then
-     CCXXFLAGS_JDK="$CCXXFLAGS_JDK -DLINUX"
+     COMMON_CCXXFLAGS_JDK="$COMMON_CCXXFLAGS_JDK -DLINUX"
    fi
 Index: b/jdk/make/lib/SoundLibraries.gmk
 ===================================================================
@@ -127,7 +127,7 @@ Index: b/hotspot/make/defs.make
 ===================================================================
 --- a/hotspot/make/defs.make
 +++ b/hotspot/make/defs.make
-@@ -325,6 +325,13 @@ ifneq ($(OSNAME),windows)
+@@ -326,6 +326,13 @@ ifneq ($(OSNAME),windows)
    LIBARCH/ppc64   = ppc64
    LIBARCH/zero    = $(ZERO_LIBARCH)
  

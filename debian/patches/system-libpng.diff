@@ -56,7 +56,7 @@ Index: b/common/autoconf/spec.gmk.in
 ===================================================================
 --- a/common/autoconf/spec.gmk.in
 +++ b/common/autoconf/spec.gmk.in
-@@ -563,6 +563,7 @@ endif
+@@ -567,6 +567,7 @@ endif
  ENABLE_JFR=@ENABLE_JFR@
  ENABLE_INTREE_EC=@ENABLE_INTREE_EC@
  USE_EXTERNAL_LIBJPEG:=@USE_EXTERNAL_LIBJPEG@

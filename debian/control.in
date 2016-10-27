@@ -1,21 +1,20 @@
 Source: @basename@
 Section: java
 Priority: optional
-Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
-XSBC-Original-Maintainer: OpenJDK Team <openjdk@lists.launchpad.net>
+Maintainer: OpenJDK Team <openjdk@lists.launchpad.net>
 Uploaders: Matthias Klose <doko@ubuntu.com>
-Build-Depends: debhelper (>= 5), quilt, m4, lsb-release, zip, unzip,
+Build-Depends: debhelper (>= 9), quilt, m4, lsb-release, zip, unzip,
   sharutils, gawk, cpio, pkg-config, procps, wdiff, @bd_fastjar@
-  @bd_autotools@ @bd_ant@ @bd_cacao@ @bd_jamvm@
+  @bd_autotools@ @bd_ant@ @bd_jamvm@
   @bd_gcc@
   @bd_bootstrap@
   @bd_openjdk@
   @bd_zero@ @bd_shark@
   @bd_syslibs@ @bd_pulsejava@ @bd_systemtap@
   @bd_nss@ @bd_tzdata@
-  @bd_mauve@ @bd_jtreg@ @bd_xvfb@
+  @bd_jtreg@ @bd_xvfb@
   time, @bd_cross@
-Standards-Version: 3.9.7
+Standards-Version: 3.9.8
 Homepage: http://openjdk.java.net/
 Vcs-Bzr: http://bazaar.launchpad.net/~openjdk/openjdk/openjdk8
 Vcs-Browser: https://code.launchpad.net/~openjdk/openjdk/openjdk8
@@ -47,7 +46,7 @@ Depends: ${jredefault:Depends}, ${cacert:Depends},
   ${mountpoint:Depends},
   ${shlibs:Depends}, ${misc:Depends}
 Recommends: ${dlopenhl:Recommends}, ${jamvm:Recommends}
-Suggests: ${cacao:Recommends}, ${jamvm:Suggests},
+Suggests: ${jamvm:Suggests},
   libnss-mdns,
   @core_fonts@,
   @cjk_fonts@

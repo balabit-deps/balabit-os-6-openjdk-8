@@ -1,5 +1,7 @@
+Index: b/jdk/src/share/classes/javax/swing/JList.java
+===================================================================
 --- a/jdk/src/share/classes/javax/swing/JList.java
-+++ a/jdk/src/share/classes/javax/swing/JList.java
++++ b/jdk/src/share/classes/javax/swing/JList.java
 @@ -3371,7 +3371,12 @@ public class JList<E> extends JComponent
              }
  
@@ -48,8 +50,10 @@
              }
  
  
+Index: b/jdk/src/share/classes/javax/swing/JTree.java
+===================================================================
 --- a/jdk/src/share/classes/javax/swing/JTree.java
-+++ a/jdk/src/share/classes/javax/swing/JTree.java
++++ b/jdk/src/share/classes/javax/swing/JTree.java
 @@ -4962,7 +4962,7 @@ public class JTree extends JComponent im
              public AccessibleSelection getAccessibleSelection() {
                  AccessibleContext ac = getCurrentAccessibleContext();
@@ -77,8 +81,10 @@
                  } else {
                      return null;
                  }
+Index: b/jdk/src/share/classes/javax/swing/table/JTableHeader.java
+===================================================================
 --- a/jdk/src/share/classes/javax/swing/table/JTableHeader.java
-+++ a/jdk/src/share/classes/javax/swing/table/JTableHeader.java
++++ b/jdk/src/share/classes/javax/swing/table/JTableHeader.java
 @@ -1083,7 +1083,12 @@ public class JTableHeader extends JCompo
              }
  
@@ -127,8 +133,10 @@
              }
  
  
+Index: b/jdk/src/share/classes/javax/swing/JTable.java
+===================================================================
 --- a/jdk/src/share/classes/javax/swing/JTable.java
-+++ a/jdk/src/share/classes/javax/swing/JTable.java
++++ b/jdk/src/share/classes/javax/swing/JTable.java
 @@ -8218,7 +8218,12 @@ public class JTable extends JComponent i
               * @return the <code>AccessibleAction</code>, or <code>null</code>
               */
@@ -241,9 +249,11 @@
              }
  
  
+Index: b/jdk/src/windows/classes/com/sun/java/accessibility/AccessBridge.java
+===================================================================
 --- a/jdk/src/windows/classes/com/sun/java/accessibility/AccessBridge.java
-+++ a/jdk/src/windows/classes/com/sun/java/accessibility/AccessBridge.java
-@@ -6505,7 +6505,7 @@ final public class AccessBridge extends
++++ b/jdk/src/windows/classes/com/sun/java/accessibility/AccessBridge.java
+@@ -6509,7 +6509,7 @@ final public class AccessBridge extends
          public AccessibleSelection getAccessibleSelection() {
              AccessibleContext ac = getCurrentAccessibleContext();
              if (ac != null && isLeaf) {
@@ -252,7 +262,7 @@
              } else {
                  return this;
              }
-@@ -6520,7 +6520,7 @@ final public class AccessBridge extends
+@@ -6524,7 +6524,7 @@ final public class AccessBridge extends
          public AccessibleText getAccessibleText() {
              AccessibleContext ac = getCurrentAccessibleContext();
              if (ac != null) {
@@ -261,7 +271,7 @@
              } else {
                  return null;
              }
-@@ -6535,7 +6535,7 @@ final public class AccessBridge extends
+@@ -6539,7 +6539,7 @@ final public class AccessBridge extends
          public AccessibleValue getAccessibleValue() {
              AccessibleContext ac = getCurrentAccessibleContext();
              if (ac != null) {
