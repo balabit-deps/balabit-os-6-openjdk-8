@@ -24,8 +24,6 @@ Summary: NewGlobalRef/DeleteGlobalRef as needed.
 Reviewed-by:
 Contributed-by: yamauchi@google.com
 
-Index: b/jdk/make/mapfiles/libfontmanager/mapfile-vers.openjdk
-===================================================================
 --- a/jdk/make/mapfiles/libfontmanager/mapfile-vers.openjdk
 +++ b/jdk/make/mapfiles/libfontmanager/mapfile-vers.openjdk
 @@ -29,6 +29,7 @@
@@ -36,8 +34,6 @@ Index: b/jdk/make/mapfiles/libfontmanager/mapfile-vers.openjdk
                  getSunFontIDs;
                  newLayoutTableCache;
                  freeLayoutTableCache;
-Index: b/jdk/src/share/native/sun/font/freetypeScaler.c
-===================================================================
 --- a/jdk/src/share/native/sun/font/freetypeScaler.c
 +++ b/jdk/src/share/native/sun/font/freetypeScaler.c
 @@ -48,16 +48,6 @@

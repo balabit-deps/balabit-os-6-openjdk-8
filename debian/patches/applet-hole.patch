@@ -1,5 +1,3 @@
-Index: b/jdk/src/share/classes/sun/applet/AppletPanel.java
-===================================================================
 --- a/jdk/src/share/classes/sun/applet/AppletPanel.java
 +++ b/jdk/src/share/classes/sun/applet/AppletPanel.java
 @@ -61,7 +61,7 @@ abstract class AppletPanel extends Panel
@@ -40,8 +38,6 @@ Index: b/jdk/src/share/classes/sun/applet/AppletPanel.java
          if (status != APPLET_DISPOSE) {
              showAppletStatus("notdisposed");
              return;
-Index: b/jdk/src/share/classes/sun/applet/AppletViewerPanel.java
-===================================================================
 --- a/jdk/src/share/classes/sun/applet/AppletViewerPanel.java
 +++ b/jdk/src/share/classes/sun/applet/AppletViewerPanel.java
 @@ -42,25 +42,25 @@ import sun.tools.jar.*;

@@ -1,7 +1,5 @@
 # DP: Add support for zero architectures alpha, m68k, mips*, sh4
 
-Index: b/common/autoconf/platform.m4
-===================================================================
 --- a/common/autoconf/platform.m4
 +++ b/common/autoconf/platform.m4
 @@ -42,6 +42,12 @@ AC_DEFUN([PLATFORM_EXTRACT_VARS_FROM_CPU
@@ -91,8 +89,6 @@ Index: b/common/autoconf/platform.m4
      ppc)     ZERO_ARCHDEF=PPC32 ;;
      ppc64)   ZERO_ARCHDEF=PPC64 ;;
      s390*)   ZERO_ARCHDEF=S390  ;;
-Index: b/common/autoconf/toolchain.m4
-===================================================================
 --- a/common/autoconf/toolchain.m4
 +++ b/common/autoconf/toolchain.m4
 @@ -1354,6 +1354,8 @@ AC_DEFUN_ONCE([TOOLCHAIN_SETUP_COMPILER_

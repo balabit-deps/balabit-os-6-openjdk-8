@@ -1,5 +1,3 @@
-Index: b/jdk/src/solaris/classes/sun/awt/X11/XWindowPeer.java
-===================================================================
 --- a/jdk/src/solaris/classes/sun/awt/X11/XWindowPeer.java
 +++ b/jdk/src/solaris/classes/sun/awt/X11/XWindowPeer.java
 @@ -1220,6 +1220,7 @@ class XWindowPeer extends XPanelPeer imp

@@ -2,8 +2,6 @@
 # DP:   http://hg.openjdk.java.net/jdk9/client/rev/bfd9a3e1aeb5
 # DP:   http://hg.openjdk.java.net/jdk9/client/jdk/rev/320743f0b4fc
 
-Index: b/common/autoconf/generated-configure.sh
-===================================================================
 --- a/common/autoconf/generated-configure.sh
 +++ b/common/autoconf/generated-configure.sh
 @@ -1071,6 +1071,7 @@ enable_freetype_bundling
@@ -35,7 +33,7 @@ Index: b/common/autoconf/generated-configure.sh
    if test "x$JVM_VARIANT_KERNEL" = xtrue; then
      if test "x$OPENJDK_TARGET_CPU_BITS" = x64; then
        as_fn_error $? "You cannot build a kernel JVM for a 64-bit machine." "$LINENO" 5
-@@ -35242,10 +35250,43 @@ done
+@@ -35239,10 +35247,43 @@ done
    # Check for the jpeg library
    #
  
@@ -83,7 +81,7 @@ Index: b/common/autoconf/generated-configure.sh
    $as_echo_n "(cached) " >&6
  else
    ac_check_lib_save_LIBS=$LIBS
-@@ -35253,27 +35294,33 @@ LIBS="-ljpeg  $LIBS"
+@@ -35250,27 +35291,33 @@ LIBS="-ljpeg  $LIBS"
  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
  /* end confdefs.h.  */
  
@@ -124,7 +122,7 @@ Index: b/common/autoconf/generated-configure.sh
    cat >>confdefs.h <<_ACEOF
  #define HAVE_LIBJPEG 1
  _ACEOF
-@@ -35281,13 +35328,16 @@ _ACEOF
+@@ -35278,13 +35325,16 @@ _ACEOF
    LIBS="-ljpeg $LIBS"
  
  else
@@ -145,8 +143,6 @@ Index: b/common/autoconf/generated-configure.sh
  
    ###############################################################################
    #
-Index: b/common/autoconf/libraries.m4
-===================================================================
 --- a/common/autoconf/libraries.m4
 +++ b/common/autoconf/libraries.m4
 @@ -595,11 +595,36 @@ AC_DEFUN_ONCE([LIB_SETUP_MISC_LIBS],
@@ -191,8 +187,6 @@ Index: b/common/autoconf/libraries.m4
    AC_SUBST(USE_EXTERNAL_LIBJPEG)
  
    ###############################################################################
-Index: b/jdk/make/lib/Awt2dLibraries.gmk
-===================================================================
 --- a/jdk/make/lib/Awt2dLibraries.gmk
 +++ b/jdk/make/lib/Awt2dLibraries.gmk
 @@ -703,21 +703,24 @@ $(BUILD_LIBLCMS): $(BUILD_LIBAWT)
@@ -321,8 +315,6 @@ Index: b/jdk/make/lib/Awt2dLibraries.gmk
        LDFLAGS_SUFFIX_solaris := -lc, \
        VERSIONINFO_RESOURCE := $(JDK_TOPDIR)/src/windows/resource/version.rc, \
        RC_FLAGS := $(RC_FLAGS) \
-Index: b/jdk/src/share/classes/com/sun/imageio/plugins/jpeg/JPEGImageReader.java
-===================================================================
 --- a/jdk/src/share/classes/com/sun/imageio/plugins/jpeg/JPEGImageReader.java
 +++ b/jdk/src/share/classes/com/sun/imageio/plugins/jpeg/JPEGImageReader.java
 @@ -89,7 +89,7 @@ public class JPEGImageReader extends Ima
@@ -334,8 +326,6 @@ Index: b/jdk/src/share/classes/com/sun/imageio/plugins/jpeg/JPEGImageReader.java
                      return null;
                  }
              });
-Index: b/jdk/src/share/classes/com/sun/imageio/plugins/jpeg/JPEGImageWriter.java
-===================================================================
 --- a/jdk/src/share/classes/com/sun/imageio/plugins/jpeg/JPEGImageWriter.java
 +++ b/jdk/src/share/classes/com/sun/imageio/plugins/jpeg/JPEGImageWriter.java
 @@ -177,7 +177,7 @@ public class JPEGImageWriter extends Ima
@@ -347,8 +337,6 @@ Index: b/jdk/src/share/classes/com/sun/imageio/plugins/jpeg/JPEGImageWriter.java
                      return null;
                  }
              });
-Index: b/jdk/src/share/classes/sun/awt/image/JPEGImageDecoder.java
-===================================================================
 --- a/jdk/src/share/classes/sun/awt/image/JPEGImageDecoder.java
 +++ b/jdk/src/share/classes/sun/awt/image/JPEGImageDecoder.java
 @@ -56,7 +56,7 @@ public class JPEGImageDecoder extends Im
@@ -360,8 +348,6 @@ Index: b/jdk/src/share/classes/sun/awt/image/JPEGImageDecoder.java
                      return null;
                  }
              });
-Index: b/jdk/src/share/native/sun/awt/image/jpeg/imageioJPEG.c
-===================================================================
 --- a/jdk/src/share/native/sun/awt/image/jpeg/imageioJPEG.c
 +++ b/jdk/src/share/native/sun/awt/image/jpeg/imageioJPEG.c
 @@ -51,7 +51,7 @@

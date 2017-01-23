@@ -1,5 +1,3 @@
-Index: b/jdk/src/share/classes/javax/swing/JList.java
-===================================================================
 --- a/jdk/src/share/classes/javax/swing/JList.java
 +++ b/jdk/src/share/classes/javax/swing/JList.java
 @@ -3371,7 +3371,12 @@ public class JList<E> extends JComponent
@@ -50,8 +48,6 @@ Index: b/jdk/src/share/classes/javax/swing/JList.java
              }
  
  
-Index: b/jdk/src/share/classes/javax/swing/JTree.java
-===================================================================
 --- a/jdk/src/share/classes/javax/swing/JTree.java
 +++ b/jdk/src/share/classes/javax/swing/JTree.java
 @@ -4962,7 +4962,7 @@ public class JTree extends JComponent im
@@ -81,8 +77,6 @@ Index: b/jdk/src/share/classes/javax/swing/JTree.java
                  } else {
                      return null;
                  }
-Index: b/jdk/src/share/classes/javax/swing/table/JTableHeader.java
-===================================================================
 --- a/jdk/src/share/classes/javax/swing/table/JTableHeader.java
 +++ b/jdk/src/share/classes/javax/swing/table/JTableHeader.java
 @@ -1083,7 +1083,12 @@ public class JTableHeader extends JCompo
@@ -133,8 +127,6 @@ Index: b/jdk/src/share/classes/javax/swing/table/JTableHeader.java
              }
  
  
-Index: b/jdk/src/share/classes/javax/swing/JTable.java
-===================================================================
 --- a/jdk/src/share/classes/javax/swing/JTable.java
 +++ b/jdk/src/share/classes/javax/swing/JTable.java
 @@ -8218,7 +8218,12 @@ public class JTable extends JComponent i
@@ -249,8 +241,6 @@ Index: b/jdk/src/share/classes/javax/swing/JTable.java
              }
  
  
-Index: b/jdk/src/windows/classes/com/sun/java/accessibility/AccessBridge.java
-===================================================================
 --- a/jdk/src/windows/classes/com/sun/java/accessibility/AccessBridge.java
 +++ b/jdk/src/windows/classes/com/sun/java/accessibility/AccessBridge.java
 @@ -6509,7 +6509,7 @@ final public class AccessBridge extends

@@ -1,7 +1,5 @@
 # DP: Define _alpha_ / _sh_ preprocessor macros instead of alpha / sh.
 
-Index: b/common/autoconf/toolchain.m4
-===================================================================
 --- a/common/autoconf/toolchain.m4
 +++ b/common/autoconf/toolchain.m4
 @@ -1163,7 +1163,13 @@ AC_DEFUN_ONCE([TOOLCHAIN_SETUP_COMPILER_

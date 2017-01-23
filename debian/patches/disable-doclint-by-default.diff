@@ -10,7 +10,7 @@ Author: Andrew John Hughes <ahughes@redhat.com>
 Forwarded: not-needed
 --- a/langtools/src/share/classes/com/sun/tools/javadoc/DocEnv.java
 +++ b/langtools/src/share/classes/com/sun/tools/javadoc/DocEnv.java
-@@ -811,10 +811,9 @@
+@@ -812,10 +812,9 @@ public class DocEnv {
              doclintOpts.add(opt == null ? DocLint.XMSGS_OPTION : DocLint.XMSGS_CUSTOM_PREFIX + opt);
          }
  
@@ -26,7 +26,7 @@ Forwarded: not-needed
  
 --- a/langtools/test/tools/javadoc/doclint/DocLintTest.java
 +++ b/langtools/test/tools/javadoc/doclint/DocLintTest.java
-@@ -130,12 +130,12 @@
+@@ -130,12 +130,12 @@ public class DocLintTest {
          };
  
          test(Collections.<String>emptyList(),
@@ -43,7 +43,7 @@ Forwarded: not-needed
  
          test(Arrays.asList("-Xdoclint:none"),
                  Main.Result.OK,
-@@ -158,8 +158,8 @@
+@@ -158,8 +158,8 @@ public class DocLintTest {
                  EnumSet.of(Message.DL_WRN12));
  
          test(Arrays.asList(rawDiags, "-private"),

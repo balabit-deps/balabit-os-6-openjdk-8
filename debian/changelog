@@ -1,44 +1,83 @@
-openjdk-8 (8u111-b14-2ubuntu0.16.04.2) xenial-security; urgency=medium
+openjdk-8 (8u121-b13-0ubuntu1.16.04.2) xenial-security; urgency=medium
 
   * Backport to 16.04.
 
- -- Tiago Stürmer Daitx <tiago.daitx@canonical.com>  Thu, 27 Oct 2016 14:18:35 +0000
+ -- Tiago Stürmer Daitx <tiago.daitx@canonical.com>  Mon, 23 Jan 2017 11:23:44 +0000
 
-openjdk-8 (8u111-b14-2ubuntu0.16.10.2) yakkety-security; urgency=medium
+openjdk-8 (8u121-b13-0ubuntu1.16.10.2) yakkety-security; urgency=medium
 
-  * debian/rules: remove samevm/othervm options from jtreg tests.
-  * debian/buildwatch.sh: noisy and quiet logic blocks were swapped.
-
- -- Tiago Stürmer Daitx <tiago.daitx@canonical.com>  Thu, 27 Oct 2016 14:16:18 +0000
-
-openjdk-8 (8u111-b14-2ubuntu0.16.10.1) yakkety-security; urgency=medium
-
-  * Security fixes in 8u111:
-    - CVE-2016-5568, S8158993: Service Menu services.
-    - CVE-2016-5582, S8160591: Improve internal array handling.
-    - CVE-2016-5573, S8159519: Reformat JDWP messages.
-    - CVE-2016-5597, S8160838: Better HTTP service.
-    - CVE-2016-5554, S8157739: Classloader Consistency Checking.
-    - CVE-2016-5542, S8155973: Tighten jar checks.
-  * debian/rules: removed all mauve and cacao references, updated jtreg tests
-    to use agentvm and auto concurrency, use autoconf 2.68 for precise.
   * debian/buildwatch.sh: updated to stop it if no 'make' process is running,
     as it probably means that the build failed - otherwise buildwatch keeps
     the builder alive until it exits after the timer (3 hours by default)
     expires.
-  * debian/control.in: removed mauve and cacao references.
-  * debian/copyright.cacao: deleted file.
-  * debian/README.source: removed caco and mauve references.
-  * debian/patches/aarch64.diff: removed cacao vm reference.
-  * debian/patches/autoconf-2.68.diff: reduce minimum autoconf requirement to
-    2.68.
-  * debian/patches/autoconf-select.diff: deleted file as it has been replaced
-    by autoconf 2.68 changes for precise.
-  * debian/patches/cacao-armv4.diff: deleted file.
-  * debian/tests/control: added autopkgtest to run jtreg testsuite.
-  * debian/tests/jtreg-autopkgtest: run jtreg tests on autopkgtest.
+  * debian/rules: updated jtreg tests to use agentvm and auto concurrency.
 
- -- Tiago Stürmer Daitx <tiago.daitx@canonical.com>  Thu, 20 Oct 2016 14:16:28 +0000
+ -- Tiago Stürmer Daitx <tiago.daitx@canonical.com>  Mon, 23 Jan 2017 11:22:24 +0000
+
+openjdk-8 (8u121-b13-0ubuntu1.16.04.1) xenial-security; urgency=medium
+
+  * Backport to 16.04.
+
+ -- Tiago Stürmer Daitx <tiago.daitx@canonical.com>  Sun, 22 Jan 2017 23:57:12 +0000
+
+openjdk-8 (8u121-b13-0ubuntu1.16.10.1) yakkety-security; urgency=medium
+
+  * Update to 8u121-b13, including security fixes.
+    - S8165344, CVE-2017-3272: A protected field can be leveraged into type
+      confusion.
+    - S8167104, CVE-2017-3289: Custom class constructor code can bypass the
+      required call to super.init allowing for uninitialized objects to be
+      created.
+    - S8156802, CVE-2017-3241: RMI deserialization should limit the types
+      deserialized to prevent attacks that could escape the sandbox.
+    - S8164143, CVE-2017-3260: It is possible to corrupt memory by calling
+      dispose() on a CMenuComponentmultiple times.
+    - S8168714, CVE-2016-5546: ECDSA will accept signatures that have various
+      extraneous bytes added to them whereas the signature is supposed to be
+      unique.
+    - S8166988, CVE-2017-3253: The PNG specification allows the [iz}Txt
+      sections to be 2^32-1 bytes long so these should not be uncompressed
+      unless the user explicitly requests it.
+    - S8168728, CVE-2016-5548: DSA signing exhibits a timing bias that may
+      leak information about k.
+    - S8168724, CVE-2016-5549: ECDSA signing exhibits a timing bias that may
+      leak information about k.
+    - S8161743, CVE-2017-3252: LdapLoginModule incorrectly tries to
+      deserialize responses from an LDAP server when an LDAP context is
+      expected.
+    - S8167223, CVE-2016-5552: Parsing of URLs can be inconsistent with how
+      users or external applications would interpret them leading to possible
+      security issues.
+    - S8168705, CVE-2016-5547: A value from an InputStream is read directly
+      into the size argument of a new byte[] without validation.
+    - S8164147, CVE-2017-3261: An integer overflow exists in
+      SocketOutputStream which can lead to memorydisclosure.
+    - S8151934, CVE-2017-3231: Under some circumstances URLClassLoader will
+      dispatch HTTP GET requests where the invoker does not have permission.
+    - S8165071, CVE-2016-2183: 3DES can be exploited for block collisions when
+      long running sessions are allowed.
+  * debian/patches/8132051-zero.diff: superseeded by upstream fix S8154210;
+    deleted.
+  * debian/patches/hotspot-JDK-8158260-ppc64el.patch: applied upstream;
+    deleted.
+  * debian/patches/6926048.diff: already applied upstream; deleted.
+  * debian/patches/jdk-ppc64el-S8170153.patch: improve StrictMath performance
+    on ppc64el. LP: #1646927.
+  * debian/patches/openjdk-ppc64el-S8170153.patch: same.
+  * debian/patches/jdk-841269-filechooser.patch: fix FileChooser behavior when
+    displaying links to non-existant files. Closes: #841269.
+  * Refreshed various patches.
+
+ -- Tiago Stürmer Daitx <tiago.daitx@canonical.com>  Tue, 17 Jan 2017 09:16:32 +0000
+
+openjdk-8 (8u111-b14-3) unstable; urgency=high
+
+  [ Tiago Stürmer Daitx ]
+  * Remove cacao references, updated jtreg tests to use agentvm and auto
+    concurrency.
+  * Run the jtreg tests on autopkg testing.
+
+ -- Matthias Klose <doko@ubuntu.com>  Wed, 02 Nov 2016 20:05:41 +0100
 
 openjdk-8 (8u111-b14-2) unstable; urgency=high
 
@@ -49,6 +88,12 @@ openjdk-8 (8u111-b14-2) unstable; urgency=high
 openjdk-8 (8u111-b14-1) unstable; urgency=high
 
   * Update to 8u111-b14, including security fixes.
+    - CVE-2016-5568, S8158993: Service Menu services.
+    - CVE-2016-5582, S8160591: Improve internal array handling.
+    - CVE-2016-5573, S8159519: Reformat JDWP messages.
+    - CVE-2016-5597, S8160838: Better HTTP service.
+    - CVE-2016-5554, S8157739: Classloader Consistency Checking.
+    - CVE-2016-5542, S8155973: Tighten jar checks.
   * Enable hotspot builds for sparc64. Closes: #835973.
 
  -- Matthias Klose <doko@ubuntu.com>  Wed, 19 Oct 2016 19:02:13 +0200

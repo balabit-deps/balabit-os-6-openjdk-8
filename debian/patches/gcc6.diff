@@ -8,10 +8,9 @@
 Summary: C++ standard needs to be explicitly set and some optimisations turned off to build on GCC 6
 Reviewed-by: erikj, dholmes, kbarrett
 
-diff --git a/common/autoconf/generated-configure.sh b/common/autoconf/generated-configure.sh
 --- a/common/autoconf/generated-configure.sh
 +++ b/common/autoconf/generated-configure.sh
-@@ -679,6 +679,9 @@
+@@ -679,6 +679,9 @@ CFLAGS_JDKEXE
  CFLAGS_JDKLIB
  MACOSX_VERSION_MIN
  PACKAGE_PATH
@@ -21,7 +20,7 @@ diff --git a/common/autoconf/generated-configure.sh b/common/autoconf/generated-
  LEGACY_EXTRA_LDFLAGS
  LEGACY_EXTRA_CXXFLAGS
  LEGACY_EXTRA_CFLAGS
-@@ -743,6 +746,8 @@
+@@ -743,6 +746,8 @@ LD
  ac_ct_OBJC
  OBJCFLAGS
  OBJC
@@ -30,7 +29,7 @@ diff --git a/common/autoconf/generated-configure.sh b/common/autoconf/generated-
  ac_ct_CXX
  CXXFLAGS
  CXX
-@@ -3672,7 +3677,7 @@
+@@ -3672,7 +3677,7 @@ fi
  
  
  #
@@ -39,7 +38,7 @@ diff --git a/common/autoconf/generated-configure.sh b/common/autoconf/generated-
  # DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  #
  # This code is free software; you can redistribute it and/or modify it
-@@ -3795,6 +3800,19 @@
+@@ -3795,6 +3800,19 @@ fi
  # questions.
  #
  
@@ -59,7 +58,7 @@ diff --git a/common/autoconf/generated-configure.sh b/common/autoconf/generated-
  # $1 = compiler to test (CC or CXX)
  # $2 = human readable name of compiler (C or C++)
  
-@@ -3818,10 +3836,22 @@
+@@ -3818,10 +3836,22 @@ fi
  
  
  
@@ -84,7 +83,7 @@ diff --git a/common/autoconf/generated-configure.sh b/common/autoconf/generated-
  
  
  
-@@ -3829,6 +3859,8 @@
+@@ -3829,6 +3859,8 @@ fi
  # Setup the JTREG paths
  
  
@@ -93,7 +92,7 @@ diff --git a/common/autoconf/generated-configure.sh b/common/autoconf/generated-
  #
  # Copyright (c) 2011, 2012, Oracle and/or its affiliates. All rights reserved.
  # DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
-@@ -3880,7 +3912,7 @@
+@@ -3880,7 +3912,7 @@ fi
  #CUSTOM_AUTOCONF_INCLUDE
  
  # Do not change or remove the following line, it is needed for consistency checks:
@@ -102,7 +101,7 @@ diff --git a/common/autoconf/generated-configure.sh b/common/autoconf/generated-
  
  ###############################################################################
  #
-@@ -20368,7 +20400,8 @@
+@@ -20368,7 +20400,8 @@ $as_echo "$as_me: The result from runnin
  
      # First line typically looks something like:
      # gcc (Ubuntu/Linaro 4.5.2-8ubuntu4) 4.5.2
@@ -112,7 +111,7 @@ diff --git a/common/autoconf/generated-configure.sh b/common/autoconf/generated-
      COMPILER_VENDOR=`$ECHO $COMPILER_VERSION_TEST | $SED -n "s/^\(.*\) [1-9][0-9.]*/\1/p"`
    fi
    # This sets CC_VERSION or CXX_VERSION. (This comment is a grep marker)
-@@ -21969,7 +22002,8 @@
+@@ -21969,7 +22002,8 @@ $as_echo "$as_me: The result from runnin
  
      # First line typically looks something like:
      # gcc (Ubuntu/Linaro 4.5.2-8ubuntu4) 4.5.2
@@ -122,7 +121,7 @@ diff --git a/common/autoconf/generated-configure.sh b/common/autoconf/generated-
      COMPILER_VENDOR=`$ECHO $COMPILER_VERSION_TEST | $SED -n "s/^\(.*\) [1-9][0-9.]*/\1/p"`
    fi
    # This sets CC_VERSION or CXX_VERSION. (This comment is a grep marker)
-@@ -22240,6 +22274,32 @@
+@@ -22240,6 +22274,32 @@ ac_link='$CXX -o conftest$ac_exeext $CXX
  ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
  
  
@@ -155,7 +154,7 @@ diff --git a/common/autoconf/generated-configure.sh b/common/autoconf/generated-
    ### Locate other tools
  
    if test "x$OPENJDK_TARGET_OS" = xmacosx; then
-@@ -24831,7 +24891,8 @@
+@@ -24831,7 +24891,8 @@ $as_echo "$as_me: Rewriting DUMPBIN to \
  
  
        COMPILER_TYPE=CL
@@ -165,7 +164,7 @@ diff --git a/common/autoconf/generated-configure.sh b/common/autoconf/generated-
  
  fi
  
-@@ -29664,12 +29725,57 @@
+@@ -29664,12 +29725,57 @@ fi
    #
    # Now setup the CFLAGS and LDFLAGS for the JDK build.
    # Later we will also have CFLAGS and LDFLAGS for the hotspot subrepo build.
@@ -224,7 +223,7 @@ diff --git a/common/autoconf/generated-configure.sh b/common/autoconf/generated-
        case $OPENJDK_TARGET_CPU_ARCH in
          arm )
            # on arm we don't prevent gcc to omit frame pointer but do prevent strict aliasing
-@@ -29679,16 +29785,234 @@
+@@ -29679,16 +29785,234 @@ fi
            # on ppc we don't prevent gcc to omit frame pointer nor strict-aliasing
            ;;
          * )
@@ -462,7 +461,7 @@ diff --git a/common/autoconf/generated-configure.sh b/common/autoconf/generated-
            CFLAGS_JDK="$CFLAGS_JDK -erroff=E_BAD_PRAGMA_PACK_VALUE"
            ;;
        esac
-@@ -29707,16 +30031,16 @@
+@@ -29707,16 +30031,16 @@ fi
        LDFLAGS_CXX_JDK="$LDFLAGS_CXX_JDK"
        ;;
      cl )
@@ -482,7 +481,7 @@ diff --git a/common/autoconf/generated-configure.sh b/common/autoconf/generated-
            ;;
        esac
        ;;
-@@ -29746,7 +30070,7 @@
+@@ -29746,7 +30070,7 @@ fi
        ;;
    esac
  
@@ -491,21 +490,18 @@ diff --git a/common/autoconf/generated-configure.sh b/common/autoconf/generated-
  
    # The package path is used only on macosx?
    PACKAGE_PATH=/opt/local
-@@ -29759,27 +30083,27 @@
+@@ -29759,27 +30083,27 @@ fi
      #   Note: -Dmacro         is the same as    #define macro 1
      #         -Dmacro=        is the same as    #define macro
      if test "x$OPENJDK_TARGET_OS" = xsolaris; then
 -      CCXXFLAGS_JDK="$CCXXFLAGS_JDK -D_LITTLE_ENDIAN="
--    else
--      CCXXFLAGS_JDK="$CCXXFLAGS_JDK -D_LITTLE_ENDIAN"
--    fi
--  else
--    CCXXFLAGS_JDK="$CCXXFLAGS_JDK -D_BIG_ENDIAN"
 +      COMMON_CCXXFLAGS_JDK="$COMMON_CCXXFLAGS_JDK -D_LITTLE_ENDIAN="
-+    else
+     else
+-      CCXXFLAGS_JDK="$CCXXFLAGS_JDK -D_LITTLE_ENDIAN"
 +      COMMON_CCXXFLAGS_JDK="$COMMON_CCXXFLAGS_JDK -D_LITTLE_ENDIAN"
-+    fi
-+  else
+     fi
+   else
+-    CCXXFLAGS_JDK="$CCXXFLAGS_JDK -D_BIG_ENDIAN"
 +    COMMON_CCXXFLAGS_JDK="$COMMON_CCXXFLAGS_JDK -D_BIG_ENDIAN"
    fi
    if test "x$OPENJDK_TARGET_OS" = xlinux; then
@@ -530,7 +526,7 @@ diff --git a/common/autoconf/generated-configure.sh b/common/autoconf/generated-
      # Setting these parameters makes it an error to link to macosx APIs that are
      # newer than the given OS version and makes the linked binaries compatible even
      # if built on a newer version of the OS.
-@@ -29789,25 +30113,25 @@
+@@ -29789,25 +30113,25 @@ fi
      # The macro takes the version with no dots, ex: 1070
      # Let the flags variables get resolved in make for easier override on make
      # command line.
@@ -547,29 +543,24 @@ diff --git a/common/autoconf/generated-configure.sh b/common/autoconf/generated-
 +    COMMON_CCXXFLAGS_JDK="$COMMON_CCXXFLAGS_JDK -DNDEBUG"
    if test "x$OPENJDK_TARGET_OS" = xsolaris; then
 -    CCXXFLAGS_JDK="$CCXXFLAGS_JDK -DTRIMMED"
--  fi
--  else
++    COMMON_CCXXFLAGS_JDK="$COMMON_CCXXFLAGS_JDK -DTRIMMED"
+   fi
+   else
 -    CCXXFLAGS_JDK="$CCXXFLAGS_JDK -DDEBUG"
--  fi
--
++    COMMON_CCXXFLAGS_JDK="$COMMON_CCXXFLAGS_JDK -DDEBUG"
+   fi
+ 
 -  CCXXFLAGS_JDK="$CCXXFLAGS_JDK -DARCH='\"$OPENJDK_TARGET_CPU_LEGACY\"' -D$OPENJDK_TARGET_CPU_LEGACY"
 -  CCXXFLAGS_JDK="$CCXXFLAGS_JDK -DRELEASE='\"\$(RELEASE)\"'"
--
--  CCXXFLAGS_JDK="$CCXXFLAGS_JDK \
-+    COMMON_CCXXFLAGS_JDK="$COMMON_CCXXFLAGS_JDK -DTRIMMED"
-+  fi
-+  else
-+    COMMON_CCXXFLAGS_JDK="$COMMON_CCXXFLAGS_JDK -DDEBUG"
-+  fi
-+
 +  COMMON_CCXXFLAGS_JDK="$COMMON_CCXXFLAGS_JDK -DARCH='\"$OPENJDK_TARGET_CPU_LEGACY\"' -D$OPENJDK_TARGET_CPU_LEGACY"
 +  COMMON_CCXXFLAGS_JDK="$COMMON_CCXXFLAGS_JDK -DRELEASE='\"\$(RELEASE)\"'"
-+
+ 
+-  CCXXFLAGS_JDK="$CCXXFLAGS_JDK \
 +  COMMON_CCXXFLAGS_JDK="$COMMON_CCXXFLAGS_JDK \
        -I${JDK_OUTPUTDIR}/include \
        -I${JDK_OUTPUTDIR}/include/$OPENJDK_TARGET_OS \
        -I${JDK_TOPDIR}/src/share/javavm/export \
-@@ -29816,12 +30140,12 @@
+@@ -29816,12 +30140,12 @@ fi
        -I${JDK_TOPDIR}/src/$OPENJDK_TARGET_OS_API_DIR/native/common"
  
    # The shared libraries are compiled using the picflag.
@@ -586,7 +577,7 @@ diff --git a/common/autoconf/generated-configure.sh b/common/autoconf/generated-
  
    # Now this is odd. The JDK native libraries have to link against libjvm.so
    # On 32-bit machines there is normally two distinct libjvm.so:s, client and server.
-@@ -29905,7 +30229,6 @@
+@@ -29905,7 +30229,6 @@ fi
  
  
  
@@ -594,7 +585,7 @@ diff --git a/common/autoconf/generated-configure.sh b/common/autoconf/generated-
    # Some Zero and Shark settings.
    # ZERO_ARCHFLAG tells the compiler which mode to build for
    case "${OPENJDK_TARGET_CPU}" in
-@@ -29916,8 +30239,9 @@
+@@ -29916,8 +30239,9 @@ fi
        ZERO_ARCHFLAG="${COMPILER_TARGET_BITS_FLAG}${OPENJDK_TARGET_CPU_BITS}"
    esac
  
@@ -606,7 +597,7 @@ diff --git a/common/autoconf/generated-configure.sh b/common/autoconf/generated-
    supports=yes
  
    saved_cflags="$CFLAGS"
-@@ -29946,6 +30270,19 @@
+@@ -29946,6 +30270,19 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
  
    CFLAGS="$saved_cflags"
  
@@ -626,7 +617,7 @@ diff --git a/common/autoconf/generated-configure.sh b/common/autoconf/generated-
    saved_cxxflags="$CXXFLAGS"
    CXXFLAGS="$CXXFLAG $ZERO_ARCHFLAG"
    ac_ext=cpp
-@@ -29975,6 +30312,20 @@
+@@ -29975,6 +30312,20 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $supports" >&5
  $as_echo "$supports" >&6; }
    if test "x$supports" = "xyes" ; then
@@ -647,7 +638,7 @@ diff --git a/common/autoconf/generated-configure.sh b/common/autoconf/generated-
      :
    else
      ZERO_ARCHFLAG=""
-@@ -29985,8 +30336,9 @@
+@@ -29985,8 +30336,9 @@ $as_echo "$supports" >&6; }
    # Check that the compiler supports -mX (or -qX on AIX) flags
    # Set COMPILER_SUPPORTS_TARGET_BITS_FLAG to 'true' if it does
  
@@ -659,7 +650,7 @@ diff --git a/common/autoconf/generated-configure.sh b/common/autoconf/generated-
    supports=yes
  
    saved_cflags="$CFLAGS"
-@@ -30015,6 +30367,19 @@
+@@ -30015,6 +30367,19 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
  
    CFLAGS="$saved_cflags"
  
@@ -679,10 +670,11 @@ diff --git a/common/autoconf/generated-configure.sh b/common/autoconf/generated-
    saved_cxxflags="$CXXFLAGS"
    CXXFLAGS="$CXXFLAG ${COMPILER_TARGET_BITS_FLAG}${OPENJDK_TARGET_CPU_BITS}"
    ac_ext=cpp
-@@ -30044,6 +30409,20 @@
+@@ -30043,6 +30408,20 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+ 
    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $supports" >&5
  $as_echo "$supports" >&6; }
-   if test "x$supports" = "xyes" ; then
++  if test "x$supports" = "xyes" ; then
 +    CXX_COMP_SUPPORTS="yes"
 +  else
 +    CXX_COMP_SUPPORTS="no"
@@ -696,11 +688,9 @@ diff --git a/common/autoconf/generated-configure.sh b/common/autoconf/generated-
 +
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $supports" >&5
 +$as_echo "$supports" >&6; }
-+  if test "x$supports" = "xyes" ; then
+   if test "x$supports" = "xyes" ; then
      COMPILER_SUPPORTS_TARGET_BITS_FLAG=true
    else
-     COMPILER_SUPPORTS_TARGET_BITS_FLAG=false
-diff --git a/common/autoconf/hotspot-spec.gmk.in b/common/autoconf/hotspot-spec.gmk.in
 --- a/common/autoconf/hotspot-spec.gmk.in
 +++ b/common/autoconf/hotspot-spec.gmk.in
 @@ -1,5 +1,5 @@
@@ -710,7 +700,7 @@ diff --git a/common/autoconf/hotspot-spec.gmk.in b/common/autoconf/hotspot-spec.
  # DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  #
  # This code is free software; you can redistribute it and/or modify it
-@@ -109,7 +109,8 @@
+@@ -109,7 +109,8 @@ LD:=@HOTSPOT_LD@
  MT:=@HOTSPOT_MT@
  RC:=@HOTSPOT_RC@
  
@@ -720,10 +710,9 @@ diff --git a/common/autoconf/hotspot-spec.gmk.in b/common/autoconf/hotspot-spec.
  EXTRA_CXXFLAGS=@LEGACY_EXTRA_CXXFLAGS@
  EXTRA_LDFLAGS=@LEGACY_EXTRA_LDFLAGS@
  
-diff --git a/common/autoconf/spec.gmk.in b/common/autoconf/spec.gmk.in
 --- a/common/autoconf/spec.gmk.in
 +++ b/common/autoconf/spec.gmk.in
-@@ -331,6 +331,10 @@
+@@ -331,6 +331,10 @@ CXXFLAGS_JDKLIB:=@CXXFLAGS_JDKLIB@
  CFLAGS_JDKEXE:=@CFLAGS_JDKEXE@
  CXXFLAGS_JDKEXE:=@CXXFLAGS_JDKEXE@
  
@@ -734,7 +723,6 @@ diff --git a/common/autoconf/spec.gmk.in b/common/autoconf/spec.gmk.in
  CXX:=@FIXPATH@ @CCACHE@ @CXX@
  #CXXFLAGS:=@CXXFLAGS@
  
-diff --git a/common/autoconf/toolchain.m4 b/common/autoconf/toolchain.m4
 --- a/common/autoconf/toolchain.m4
 +++ b/common/autoconf/toolchain.m4
 @@ -23,9 +23,59 @@
@@ -798,7 +786,7 @@ diff --git a/common/autoconf/toolchain.m4 b/common/autoconf/toolchain.m4
  [
    COMPILER=[$]$1
    COMPILER_NAME=$2
-@@ -81,7 +131,8 @@
+@@ -81,7 +131,8 @@ AC_DEFUN([TOOLCHAIN_CHECK_COMPILER_VERSI
  
      # First line typically looks something like:
      # gcc (Ubuntu/Linaro 4.5.2-8ubuntu4) 4.5.2
@@ -808,7 +796,7 @@ diff --git a/common/autoconf/toolchain.m4 b/common/autoconf/toolchain.m4
      COMPILER_VENDOR=`$ECHO $COMPILER_VERSION_TEST | $SED -n "s/^\(.*\) @<:@1-9@:>@@<:@0-9.@:>@*/\1/p"`
    fi
    # This sets CC_VERSION or CXX_VERSION. (This comment is a grep marker)
-@@ -181,7 +232,7 @@
+@@ -181,7 +232,7 @@ AC_DEFUN([TOOLCHAIN_FIND_COMPILER],
      AC_MSG_RESULT([no, keeping $1])
      $1="$TEST_COMPILER"
    fi
@@ -817,7 +805,7 @@ diff --git a/common/autoconf/toolchain.m4 b/common/autoconf/toolchain.m4
  ])
  
  
-@@ -385,6 +436,12 @@
+@@ -385,6 +436,12 @@ AC_DEFUN([TOOLCHAIN_SETUP_PATHS],
    # Now that we have resolved CXX ourself, let autoconf have its go at it
    AC_PROG_CXX([$CXX])
  
@@ -830,7 +818,7 @@ diff --git a/common/autoconf/toolchain.m4 b/common/autoconf/toolchain.m4
    ### Locate other tools
  
    if test "x$OPENJDK_TARGET_OS" = xmacosx; then
-@@ -507,7 +564,8 @@
+@@ -507,7 +564,8 @@ AC_DEFUN([TOOLCHAIN_SETUP_PATHS],
        BASIC_FIXUP_EXECUTABLE(DUMPBIN)
  
        COMPILER_TYPE=CL
@@ -840,7 +828,7 @@ diff --git a/common/autoconf/toolchain.m4 b/common/autoconf/toolchain.m4
    ])
    AC_SUBST(RC_FLAGS)
    AC_SUBST(COMPILER_TYPE)
-@@ -954,12 +1012,20 @@
+@@ -954,12 +1012,20 @@ AC_DEFUN_ONCE([TOOLCHAIN_SETUP_COMPILER_
    #
    # Now setup the CFLAGS and LDFLAGS for the JDK build.
    # Later we will also have CFLAGS and LDFLAGS for the hotspot subrepo build.
@@ -862,7 +850,7 @@ diff --git a/common/autoconf/toolchain.m4 b/common/autoconf/toolchain.m4
        case $OPENJDK_TARGET_CPU_ARCH in
          arm )
            # on arm we don't prevent gcc to omit frame pointer but do prevent strict aliasing
-@@ -969,16 +1035,17 @@
+@@ -969,16 +1035,17 @@ AC_DEFUN_ONCE([TOOLCHAIN_SETUP_COMPILER_
            # on ppc we don't prevent gcc to omit frame pointer nor strict-aliasing
            ;;
          * )
@@ -883,7 +871,7 @@ diff --git a/common/autoconf/toolchain.m4 b/common/autoconf/toolchain.m4
            CFLAGS_JDK="$CFLAGS_JDK -erroff=E_BAD_PRAGMA_PACK_VALUE"
            ;;
        esac
-@@ -997,16 +1064,16 @@
+@@ -997,16 +1064,16 @@ AC_DEFUN_ONCE([TOOLCHAIN_SETUP_COMPILER_
        LDFLAGS_CXX_JDK="$LDFLAGS_CXX_JDK"
        ;;
      cl )
@@ -903,7 +891,7 @@ diff --git a/common/autoconf/toolchain.m4 b/common/autoconf/toolchain.m4
            ;;
        esac
        ;;
-@@ -1036,7 +1103,7 @@
+@@ -1036,7 +1103,7 @@ AC_DEFUN_ONCE([TOOLCHAIN_SETUP_COMPILER_
        ;;
    esac
  
@@ -912,7 +900,7 @@ diff --git a/common/autoconf/toolchain.m4 b/common/autoconf/toolchain.m4
  
    # The package path is used only on macosx?
    PACKAGE_PATH=/opt/local
-@@ -1049,27 +1116,27 @@
+@@ -1049,27 +1116,27 @@ AC_DEFUN_ONCE([TOOLCHAIN_SETUP_COMPILER_
      #   Note: -Dmacro         is the same as    #define macro 1
      #         -Dmacro=        is the same as    #define macro
      if test "x$OPENJDK_TARGET_OS" = xsolaris; then
@@ -948,7 +936,7 @@ diff --git a/common/autoconf/toolchain.m4 b/common/autoconf/toolchain.m4
      # Setting these parameters makes it an error to link to macosx APIs that are
      # newer than the given OS version and makes the linked binaries compatible even
      # if built on a newer version of the OS.
-@@ -1079,25 +1146,25 @@
+@@ -1079,25 +1146,25 @@ AC_DEFUN_ONCE([TOOLCHAIN_SETUP_COMPILER_
      # The macro takes the version with no dots, ex: 1070
      # Let the flags variables get resolved in make for easier override on make
      # command line.
@@ -982,7 +970,7 @@ diff --git a/common/autoconf/toolchain.m4 b/common/autoconf/toolchain.m4
        -I${JDK_OUTPUTDIR}/include \
        -I${JDK_OUTPUTDIR}/include/$OPENJDK_TARGET_OS \
        -I${JDK_TOPDIR}/src/share/javavm/export \
-@@ -1106,12 +1173,12 @@
+@@ -1106,12 +1173,12 @@ AC_DEFUN_ONCE([TOOLCHAIN_SETUP_COMPILER_
        -I${JDK_TOPDIR}/src/$OPENJDK_TARGET_OS_API_DIR/native/common"
  
    # The shared libraries are compiled using the picflag.
@@ -999,7 +987,7 @@ diff --git a/common/autoconf/toolchain.m4 b/common/autoconf/toolchain.m4
  
    # Now this is odd. The JDK native libraries have to link against libjvm.so
    # On 32-bit machines there is normally two distinct libjvm.so:s, client and server.
-@@ -1196,13 +1263,13 @@
+@@ -1196,13 +1263,13 @@ AC_DEFUN_ONCE([TOOLCHAIN_SETUP_COMPILER_
  ])
  
  
@@ -1018,7 +1006,7 @@ diff --git a/common/autoconf/toolchain.m4 b/common/autoconf/toolchain.m4
    supports=yes
  
    saved_cflags="$CFLAGS"
-@@ -1213,6 +1280,23 @@
+@@ -1213,6 +1280,23 @@ AC_DEFUN([TOOLCHAIN_COMPILER_CHECK_ARGUM
    AC_LANG_POP([C])
    CFLAGS="$saved_cflags"
  
@@ -1042,7 +1030,7 @@ diff --git a/common/autoconf/toolchain.m4 b/common/autoconf/toolchain.m4
    saved_cxxflags="$CXXFLAGS"
    CXXFLAGS="$CXXFLAG $1"
    AC_LANG_PUSH([C++])
-@@ -1220,7 +1304,32 @@
+@@ -1220,7 +1304,32 @@ AC_DEFUN([TOOLCHAIN_COMPILER_CHECK_ARGUM
        [supports=no])
    AC_LANG_POP([C++])
    CXXFLAGS="$saved_cxxflags"
@@ -1075,7 +1063,7 @@ diff --git a/common/autoconf/toolchain.m4 b/common/autoconf/toolchain.m4
    AC_MSG_RESULT([$supports])
    if test "x$supports" = "xyes" ; then
      m4_ifval([$2], [$2], [:])
-@@ -1311,3 +1420,20 @@
+@@ -1311,3 +1420,20 @@ AC_DEFUN_ONCE([TOOLCHAIN_SETUP_JTREG],
    AC_SUBST(JT_HOME)
    AC_SUBST(JTREGEXE)
  ])

@@ -1,5 +1,3 @@
-Index: b/jdk/src/solaris/classes/sun/awt/X11/XWM.java
-===================================================================
 --- a/jdk/src/solaris/classes/sun/awt/X11/XWM.java
 +++ b/jdk/src/solaris/classes/sun/awt/X11/XWM.java
 @@ -104,7 +104,8 @@ final class XWM

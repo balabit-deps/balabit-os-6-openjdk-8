@@ -1,7 +1,5 @@
 # DP: JDK-8141491: Unaligned memory access in Bits.c
 
-Index: b/jdk/src/share/native/java/nio/Bits.c
-===================================================================
 --- a/jdk/src/share/native/java/nio/Bits.c
 +++ b/jdk/src/share/native/java/nio/Bits.c
 @@ -67,16 +67,38 @@

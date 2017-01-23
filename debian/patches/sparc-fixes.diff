@@ -1,5 +1,3 @@
-Index: b/jdk/make/CompileDemos.gmk
-===================================================================
 --- a/jdk/make/CompileDemos.gmk
 +++ b/jdk/make/CompileDemos.gmk
 @@ -235,10 +235,12 @@ define SetupJVMTIDemo

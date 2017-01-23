@@ -1,7 +1,5 @@
 # DP: taken from http://icedtea.classpath.org/wiki/IcedTea_Patches_for_OpenJDK_8
 
-Index: b/common/autoconf/libraries.m4
-===================================================================
 --- a/common/autoconf/libraries.m4
 +++ b/common/autoconf/libraries.m4
 @@ -666,6 +666,47 @@ AC_DEFUN_ONCE([LIB_SETUP_MISC_LIBS],
@@ -52,8 +50,6 @@ Index: b/common/autoconf/libraries.m4
    # Check for the zlib library
    #
  
-Index: b/common/autoconf/spec.gmk.in
-===================================================================
 --- a/common/autoconf/spec.gmk.in
 +++ b/common/autoconf/spec.gmk.in
 @@ -567,6 +567,7 @@ endif
@@ -64,8 +60,6 @@ Index: b/common/autoconf/spec.gmk.in
  USE_EXTERNAL_LIBGIF:=@USE_EXTERNAL_LIBGIF@
  USE_EXTERNAL_LIBZ:=@USE_EXTERNAL_LIBZ@
  LIBZIP_CAN_USE_MMAP:=@LIBZIP_CAN_USE_MMAP@
-Index: b/jdk/make/lib/Awt2dLibraries.gmk
-===================================================================
 --- a/jdk/make/lib/Awt2dLibraries.gmk
 +++ b/jdk/make/lib/Awt2dLibraries.gmk
 @@ -1205,7 +1205,6 @@ endif
@@ -105,8 +99,6 @@ Index: b/jdk/make/lib/Awt2dLibraries.gmk
        LDFLAGS_SUFFIX_solaris := -lc, \
        VERSIONINFO_RESOURCE := $(JDK_TOPDIR)/src/windows/resource/version.rc, \
        RC_FLAGS := $(RC_FLAGS) \
-Index: b/jdk/src/share/native/sun/awt/splashscreen/splashscreen_png.c
-===================================================================
 --- a/jdk/src/share/native/sun/awt/splashscreen/splashscreen_png.c
 +++ b/jdk/src/share/native/sun/awt/splashscreen/splashscreen_png.c
 @@ -25,8 +25,7 @@

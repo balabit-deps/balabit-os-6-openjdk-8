@@ -1,7 +1,5 @@
 # DP: Set initial VMThreadStackSize to 1600 on s390x
 
-Index: b/hotspot/src/os_cpu/linux_zero/vm/globals_linux_zero.hpp
-===================================================================
 --- a/hotspot/src/os_cpu/linux_zero/vm/globals_linux_zero.hpp
 +++ b/hotspot/src/os_cpu/linux_zero/vm/globals_linux_zero.hpp
 @@ -36,6 +36,8 @@ define_pd_global(intx,  ThreadStackSize,

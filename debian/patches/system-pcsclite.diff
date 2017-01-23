@@ -1,5 +1,3 @@
-Index: b/common/autoconf/libraries.m4
-===================================================================
 --- a/common/autoconf/libraries.m4
 +++ b/common/autoconf/libraries.m4
 @@ -747,6 +747,53 @@ AC_DEFUN_ONCE([LIB_SETUP_MISC_LIBS],
@@ -56,8 +54,6 @@ Index: b/common/autoconf/libraries.m4
    # Check for the zlib library
    #
  
-Index: b/common/autoconf/spec.gmk.in
-===================================================================
 --- a/common/autoconf/spec.gmk.in
 +++ b/common/autoconf/spec.gmk.in
 @@ -569,6 +569,7 @@ ENABLE_INTREE_EC=@ENABLE_INTREE_EC@
@@ -68,8 +64,6 @@ Index: b/common/autoconf/spec.gmk.in
  USE_EXTERNAL_LIBZ:=@USE_EXTERNAL_LIBZ@
  LIBZIP_CAN_USE_MMAP:=@LIBZIP_CAN_USE_MMAP@
  MSVCR_DLL:=@MSVCR_DLL@
-Index: b/jdk/make/lib/SecurityLibraries.gmk
-===================================================================
 --- a/jdk/make/lib/SecurityLibraries.gmk
 +++ b/jdk/make/lib/SecurityLibraries.gmk
 @@ -75,11 +75,11 @@ $(eval $(call SetupNativeCompilation,BUI
@@ -86,8 +80,6 @@ Index: b/jdk/make/lib/SecurityLibraries.gmk
      LDFLAGS_SUFFIX_windows := winscard.lib, \
      LDFLAGS_SUFFIX_solaris := -lc, \
      VERSIONINFO_RESOURCE := $(JDK_TOPDIR)/src/windows/resource/version.rc, \
-Index: b/jdk/src/solaris/native/sun/security/smartcardio/pcsc_md.c
-===================================================================
 --- a/jdk/src/solaris/native/sun/security/smartcardio/pcsc_md.c
 +++ b/jdk/src/solaris/native/sun/security/smartcardio/pcsc_md.c
 @@ -36,6 +36,7 @@
@@ -134,8 +126,6 @@ Index: b/jdk/src/solaris/native/sun/security/smartcardio/pcsc_md.c
  #endif // __APPLE__
 +#endif
  }
-Index: b/jdk/src/solaris/native/sun/security/smartcardio/pcsc_md.h
-===================================================================
 --- a/jdk/src/solaris/native/sun/security/smartcardio/pcsc_md.h
 +++ b/jdk/src/solaris/native/sun/security/smartcardio/pcsc_md.h
 @@ -23,6 +23,8 @@

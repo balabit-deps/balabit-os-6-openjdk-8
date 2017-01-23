@@ -1,7 +1,5 @@
 # DP: Fix libjavajpeg build using the system jpeg library.
 
-Index: b/jdk/make/lib/Awt2dLibraries.gmk
-===================================================================
 --- a/jdk/make/lib/Awt2dLibraries.gmk
 +++ b/jdk/make/lib/Awt2dLibraries.gmk
 @@ -739,7 +739,7 @@ endif

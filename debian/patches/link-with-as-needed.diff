@@ -1,7 +1,5 @@
 # DP: Fix build failures with -Wl,--as-needed, don't explicitly link with -lc
 
-Index: b/jdk/make/CompileLaunchers.gmk
-===================================================================
 --- a/jdk/make/CompileLaunchers.gmk
 +++ b/jdk/make/CompileLaunchers.gmk
 @@ -427,7 +427,7 @@ endif
@@ -25,8 +23,6 @@ Index: b/jdk/make/CompileLaunchers.gmk
      OBJECT_DIR := $(JDK_OUTPUTDIR)/objs/unpackexe$(OUTPUT_SUBDIR), \
      OUTPUT_DIR := $(JDK_OUTPUTDIR)/objs/unpackexe$(OUTPUT_SUBDIR), \
      PROGRAM := unpack200, \
-Index: b/jdk/make/lib/Awt2dLibraries.gmk
-===================================================================
 --- a/jdk/make/lib/Awt2dLibraries.gmk
 +++ b/jdk/make/lib/Awt2dLibraries.gmk
 @@ -760,10 +760,10 @@ $(eval $(call SetupNativeCompilation,BUI

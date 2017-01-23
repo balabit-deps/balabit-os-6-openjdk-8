@@ -1,6 +1,4 @@
 # DP: fixes an uninitialized memory issue in adlc
-Index: b/hotspot/src/share/vm/adlc/formsopt.cpp
-===================================================================
 --- a/hotspot/src/share/vm/adlc/formsopt.cpp
 +++ b/hotspot/src/share/vm/adlc/formsopt.cpp
 @@ -440,6 +440,7 @@ FrameForm::FrameForm() {

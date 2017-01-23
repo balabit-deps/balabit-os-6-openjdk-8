@@ -1,7 +1,5 @@
 # DP: taken from http://icedtea.classpath.org/wiki/IcedTea_Patches_for_OpenJDK_8
 
-Index: b/common/autoconf/libraries.m4
-===================================================================
 --- a/common/autoconf/libraries.m4
 +++ b/common/autoconf/libraries.m4
 @@ -666,6 +666,46 @@ AC_DEFUN_ONCE([LIB_SETUP_MISC_LIBS],
@@ -51,8 +49,6 @@ Index: b/common/autoconf/libraries.m4
    # Check for the png library
    #
  
-Index: b/jdk/make/lib/Awt2dLibraries.gmk
-===================================================================
 --- a/jdk/make/lib/Awt2dLibraries.gmk
 +++ b/jdk/make/lib/Awt2dLibraries.gmk
 @@ -667,8 +667,8 @@ endif
@@ -92,8 +88,6 @@ Index: b/jdk/make/lib/Awt2dLibraries.gmk
  
  ##########################################################################################
  
-Index: b/jdk/src/share/classes/sun/java2d/cmm/lcms/LCMS.java
-===================================================================
 --- a/jdk/src/share/classes/sun/java2d/cmm/lcms/LCMS.java
 +++ b/jdk/src/share/classes/sun/java2d/cmm/lcms/LCMS.java
 @@ -207,7 +207,7 @@ public class LCMS implements PCMM {

@@ -12,7 +12,7 @@ Build-Depends: debhelper (>= 9), quilt, m4, lsb-release, zip, unzip,
   @bd_zero@ @bd_shark@
   @bd_syslibs@ @bd_pulsejava@ @bd_systemtap@
   @bd_nss@ @bd_tzdata@
-  @bd_jtreg@ @bd_xvfb@
+  @bd_mauve@ @bd_jtreg@ @bd_xvfb@
   time, @bd_cross@
 Standards-Version: 3.9.8
 Homepage: http://openjdk.java.net/

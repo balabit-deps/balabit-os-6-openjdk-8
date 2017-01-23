@@ -1,7 +1,5 @@
 # DP: Add missing build bits for AArch64 from the AArch64 branch.
 
-Index: b/common/autoconf/build-aux/autoconf-config.sub
-===================================================================
 --- a/common/autoconf/build-aux/autoconf-config.sub
 +++ b/common/autoconf/build-aux/autoconf-config.sub
 @@ -264,6 +264,7 @@ case $basic_machine in
@@ -20,8 +18,6 @@ Index: b/common/autoconf/build-aux/autoconf-config.sub
  	| alpha-* | alphaev[4-8]-* | alphaev56-* | alphaev6[78]-* \
  	| alpha64-* | alpha64ev[4-8]-* | alpha64ev56-* | alpha64ev6[78]-* \
  	| alphapca5[67]-* | alpha64pca5[67]-* | arc-* \
-Index: b/common/autoconf/generated-configure.sh
-===================================================================
 --- a/common/autoconf/generated-configure.sh
 +++ b/common/autoconf/generated-configure.sh
 @@ -6868,6 +6868,12 @@ test -n "$target_alias" &&
@@ -62,7 +58,7 @@ Index: b/common/autoconf/generated-configure.sh
    if test "x$JVM_VARIANT_KERNEL" = xtrue; then
      if test "x$OPENJDK_TARGET_CPU_BITS" = x64; then
        as_fn_error $? "You cannot build a kernel JVM for a 64-bit machine." "$LINENO" 5
-@@ -29731,7 +29741,7 @@ fi
+@@ -29731,7 +29738,7 @@ fi
    #
    case $COMPILER_NAME in
      gcc )
@@ -71,7 +67,7 @@ Index: b/common/autoconf/generated-configure.sh
        -pipe \
        -D_GNU_SOURCE -D_REENTRANT -D_LARGEFILE64_SOURCE"
        CXXSTD_CXXFLAG="-std=gnu++98"
-@@ -30235,6 +30245,9 @@ $as_echo "$supports" >&6; }
+@@ -30235,6 +30242,9 @@ $as_echo "$supports" >&6; }
      s390)
        ZERO_ARCHFLAG="${COMPILER_TARGET_BITS_FLAG}31"
        ;;
@@ -81,8 +77,6 @@ Index: b/common/autoconf/generated-configure.sh
      *)
        ZERO_ARCHFLAG="${COMPILER_TARGET_BITS_FLAG}${OPENJDK_TARGET_CPU_BITS}"
    esac
-Index: b/common/autoconf/jdk-options.m4
-===================================================================
 --- a/common/autoconf/jdk-options.m4
 +++ b/common/autoconf/jdk-options.m4
 @@ -164,6 +164,9 @@ AC_DEFUN_ONCE([JDKOPT_SETUP_JVM_VARIANTS
@@ -95,8 +89,6 @@ Index: b/common/autoconf/jdk-options.m4
    AC_SUBST(INCLUDE_SA)
  
    if test "x$OPENJDK_TARGET_OS" = "xmacosx"; then
-Index: b/common/autoconf/platform.m4
-===================================================================
 --- a/common/autoconf/platform.m4
 +++ b/common/autoconf/platform.m4
 @@ -54,6 +54,12 @@ AC_DEFUN([PLATFORM_EXTRACT_VARS_FROM_CPU
@@ -112,8 +104,6 @@ Index: b/common/autoconf/platform.m4
      powerpc)
        VAR_CPU=ppc
        VAR_CPU_ARCH=ppc
-Index: b/common/autoconf/toolchain.m4
-===================================================================
 --- a/common/autoconf/toolchain.m4
 +++ b/common/autoconf/toolchain.m4
 @@ -1018,7 +1018,7 @@ AC_DEFUN_ONCE([TOOLCHAIN_SETUP_COMPILER_
@@ -135,8 +125,6 @@ Index: b/common/autoconf/toolchain.m4
      *)
        ZERO_ARCHFLAG="${COMPILER_TARGET_BITS_FLAG}${OPENJDK_TARGET_CPU_BITS}"
    esac
-Index: b/jdk/make/gensrc/GensrcMisc.gmk
-===================================================================
 --- a/jdk/make/gensrc/GensrcMisc.gmk
 +++ b/jdk/make/gensrc/GensrcMisc.gmk
 @@ -76,7 +76,7 @@ $(eval $(call SetupNativeCompilation,BUI
@@ -148,8 +136,6 @@ Index: b/jdk/make/gensrc/GensrcMisc.gmk
      OBJECT_DIR := $(GENSRC_SOR_BIN), \
      OUTPUT_DIR := $(GENSRC_SOR_BIN), \
      PROGRAM := genSocketOptionRegistry))
-Index: b/jdk/make/lib/SoundLibraries.gmk
-===================================================================
 --- a/jdk/make/lib/SoundLibraries.gmk
 +++ b/jdk/make/lib/SoundLibraries.gmk
 @@ -139,6 +139,10 @@ else
@@ -163,8 +149,6 @@ Index: b/jdk/make/lib/SoundLibraries.gmk
  endif
  
  LIBJSOUND_CFLAGS += -DEXTRA_SOUND_JNI_LIBS='"$(EXTRA_SOUND_JNI_LIBS)"'
-Index: b/jdk/src/share/native/com/sun/media/sound/SoundDefs.h
-===================================================================
 --- a/jdk/src/share/native/com/sun/media/sound/SoundDefs.h
 +++ b/jdk/src/share/native/com/sun/media/sound/SoundDefs.h
 @@ -43,6 +43,7 @@
@@ -175,8 +159,6 @@ Index: b/jdk/src/share/native/com/sun/media/sound/SoundDefs.h
  
  // **********************************
  // Make sure you set X_PLATFORM and X_ARCH defines correctly.
-Index: b/jdk/src/solaris/bin/aarch64/jvm.cfg
-===================================================================
 --- /dev/null
 +++ b/jdk/src/solaris/bin/aarch64/jvm.cfg
 @@ -0,0 +1,38 @@

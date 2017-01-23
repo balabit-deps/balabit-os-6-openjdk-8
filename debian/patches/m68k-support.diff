@@ -1,6 +1,4 @@
 
-Index: b/common/autoconf/generated-configure.sh
-===================================================================
 --- a/common/autoconf/generated-configure.sh
 +++ b/common/autoconf/generated-configure.sh
 @@ -6919,6 +6919,12 @@ test -n "$target_alias" &&
@@ -29,8 +27,6 @@ Index: b/common/autoconf/generated-configure.sh
      *)
        as_fn_error $? "unsupported cpu $host_cpu" "$LINENO" 5
        ;;
-Index: b/common/autoconf/platform.m4
-===================================================================
 --- a/common/autoconf/platform.m4
 +++ b/common/autoconf/platform.m4
 @@ -156,6 +156,12 @@ AC_DEFUN([PLATFORM_EXTRACT_VARS_FROM_CPU
@@ -46,8 +42,6 @@ Index: b/common/autoconf/platform.m4
      *)
        AC_MSG_ERROR([unsupported cpu $1])
        ;;
-Index: b/hotspot/src/os_cpu/linux_zero/vm/atomic_linux_zero.inline.hpp
-===================================================================
 --- a/hotspot/src/os_cpu/linux_zero/vm/atomic_linux_zero.inline.hpp
 +++ b/hotspot/src/os_cpu/linux_zero/vm/atomic_linux_zero.inline.hpp
 @@ -38,7 +38,7 @@
@@ -115,8 +109,6 @@ Index: b/hotspot/src/os_cpu/linux_zero/vm/atomic_linux_zero.inline.hpp
      }
  }
  #endif // M68K
-Index: b/hotspot/src/share/vm/memory/allocation.hpp
-===================================================================
 --- a/hotspot/src/share/vm/memory/allocation.hpp
 +++ b/hotspot/src/share/vm/memory/allocation.hpp
 @@ -191,7 +191,7 @@ template <MEMFLAGS F> class CHeapObj ALL
@@ -155,8 +147,6 @@ Index: b/hotspot/src/share/vm/memory/allocation.hpp
  
  // One of the following macros must be used when allocating an array
  // or object to determine whether it should reside in the C heap on in
-Index: b/hotspot/src/share/vm/oops/oop.hpp
-===================================================================
 --- a/hotspot/src/share/vm/oops/oop.hpp
 +++ b/hotspot/src/share/vm/oops/oop.hpp
 @@ -374,6 +374,6 @@ class oopDesc {
@@ -167,8 +157,6 @@ Index: b/hotspot/src/share/vm/oops/oop.hpp
 +} __attribute__ ((aligned (4)));
  
  #endif // SHARE_VM_OOPS_OOP_HPP
-Index: b/jdk/make/gensrc/GensrcX11Wrappers.gmk
-===================================================================
 --- a/jdk/make/gensrc/GensrcX11Wrappers.gmk
 +++ b/jdk/make/gensrc/GensrcX11Wrappers.gmk
 @@ -57,12 +57,16 @@ else
@@ -189,8 +177,6 @@ Index: b/jdk/make/gensrc/GensrcX11Wrappers.gmk
  	$(MKDIR) -p $(@D)
  	$(RM) '$@'
  	$(SORT) $< > $@
-Index: b/jdk/src/solaris/bin/java_md_solinux.c
-===================================================================
 --- a/jdk/src/solaris/bin/java_md_solinux.c
 +++ b/jdk/src/solaris/bin/java_md_solinux.c
 @@ -1023,12 +1023,24 @@ void SplashFreeLibrary() {
@@ -236,8 +222,6 @@ Index: b/jdk/src/solaris/bin/java_md_solinux.c
        void * tmp;
        thr_join(tid, NULL, &tmp);
        rslt = (int)tmp;
-Index: b/jdk/src/solaris/classes/sun/awt/X11/generator/sizes.32-linux-m68k
-===================================================================
 --- /dev/null
 +++ b/jdk/src/solaris/classes/sun/awt/X11/generator/sizes.32-linux-m68k
 @@ -0,0 +1,1016 @@
@@ -1257,8 +1241,6 @@ Index: b/jdk/src/solaris/classes/sun/awt/X11/generator/sizes.32-linux-m68k
 +XTextProperty.format	8
 +XTextProperty.nitems	12
 +XTextProperty	16
-Index: b/hotspot/src/share/vm/oops/constMethod.hpp
-===================================================================
 --- a/hotspot/src/share/vm/oops/constMethod.hpp
 +++ b/hotspot/src/share/vm/oops/constMethod.hpp
 @@ -224,6 +224,9 @@ private:

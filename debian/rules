@@ -346,8 +346,7 @@ endif
 # resulting in broken zero builds
 COMMON_PATCHES = \
 	gcc6.diff \
-	6926048.diff \
-	8132051-zero.diff \
+	autoconf-select.diff \
 	hotspot-warn-no-errformat.diff \
 	aarch64.diff \
 	hotspot-set-compiler.diff \
@@ -389,15 +388,12 @@ COMMON_PATCHES = \
 	8141491.diff \
 	s390x-thread-stack-size.diff \
 	jdk-getAccessibleValue.diff \
-	hotspot-JDK-8158260-ppc64el.patch \
+	openjdk-ppc64el-S8170153.patch \
+	jdk-ppc64el-S8170153.patch \
+	jdk-841269-filechooser.patch \
 
 # FIXME: update patches
 	#accessible-toolkit.patch # update for 8
-
-ifneq (,$(filter $(distrel),precise))
-  COMMON_PATCHES += autoconf-2.68.diff
-endif
-
 
 ifeq ($(with_bridge),atk)
     COMMON_PATCHES += atk-wrapper-security.patch
@@ -420,6 +416,12 @@ ifeq (,$(filter $(DEB_HOST_ARCH),$(hotspot_aarch64_archs)))
 	hotspot-powerpcspe.diff \
 	zero-sh.diff
 # FIXME	zero-opt.diff
+else
+  # aarch64 hotspot is still 8u112-b16
+  COMMON_PATCHES += \
+	sec-webrev-8u121-aarch64-hotspot-8159507.patch \
+	sec-webrev-8u121-aarch64-hotspot-8161218.patch \
+	sec-webrev-8u121-aarch64-hotspot-8167104.patch
 endif
 
 # FIXME needs an update:
@@ -634,12 +636,12 @@ jdk_hl_tools_alt= $(filter-out apt java-rmi.cgi, $(jdk_hl_tools))
 
 
 # build dependencies
-ifneq (,$(filter $(distrel),precise))
-  bd_autotools = autoconf (>= 2.68), automake, autotools-dev,
+ifneq (,$(filter $(distrel),lucid precise))
+  bd_autotools = autoconf2.69, automake, autotools-dev,
+  export AUTOCONF=autoconf2.69
 else
   bd_autotools = autoconf (>= 2.69), automake, autotools-dev,
 endif
-
 bd_bootstrap += \
 	openjdk-8-jdk | openjdk-7-jdk,
 ifeq (,$(filter $(distrel),squeeze wheezy jessie precise trusty))
@@ -717,6 +719,7 @@ endif
 
 bd_fastjar = fastjar (>= 2:0.96-0ubuntu2),
 bd_xvfb = xvfb, xauth, xfonts-base, libgl1-mesa-dri [!x32], $(bd_wm) x11-xkb-utils,
+bd_mauve = mauve,
 ifeq ($(with_pulse),yes)
   bd_pulsejava = libpulse-dev (>= 0.9.12) [!alpha],
 endif
@@ -910,6 +913,7 @@ debian/control: debian/control.in debian/rules
 	      -e 's/@bd_gcc@/$(bd_gcc)/g' \
 	      -e 's/@bd_syslibs@/$(bd_syslibs)/g' \
 	      -e 's/@bd_fastjar@/$(bd_fastjar)/g' \
+	      -e 's/@bd_mauve@/$(bd_mauve)/g' \
 	      -e 's/@bd_xvfb@/$(bd_xvfb)/g' \
 	      -e 's/@bd_jamvm@/$(bd_jamvm)/g' \
 	      -e 's/@bd_pulsejava@/$(bd_pulsejava)/g' \
@@ -1137,11 +1141,18 @@ stamps/patch: stamps/unpack stamps/jamvm-unpack
 	mv stamps/pxx $@
 
 ifeq ($(with_check),yes)
+    ifneq (,$(filter $(DEB_HOST_ARCH), $(hotspot_archs) alpha ia64 mips mipsel mips64 mips64el powerpc powerpcspe ppc64 ppc64el sh4))
+      with_mauve_check = $(default_vm)
+    endif
     ifneq (,$(filter $(DEB_HOST_ARCH), $(hotspot_archs) alpha arm64 armel armhf ia64 mips mipsel mips64 mips64el powerpc powerpcspe ppc64 ppc64el s390x sh4 x32))
       with_jtreg_check = $(default_vm)
     endif
 
     ifneq (,$(filter jamvm, $(alternate_vms)))
+      ifneq (,$(filter $(DEB_HOST_ARCH), amd64 ))
+	# only activate after testing
+	with_mauve_check += jamvm
+      endif
       ifneq (,$(filter $(DEB_HOST_ARCH), amd64 i386))
 	# only activate after testing; hangs several tests.
 	with_jtreg_check += jamvm
@@ -1149,6 +1160,10 @@ ifeq ($(with_check),yes)
     endif
 
     ifneq (,$(filter shark, $(alternate_vms)))
+      ifneq (,$(filter $(DEB_HOST_ARCH), amd64 i386 powerpc powerpcspe))
+	# only activate after testing
+	with_mauve_check += $(if $(filter $(DEB_HOST_ARCH),$(altshark_archs)),shark,zero)
+      endif
       # shark hangs on ppc64
       ifneq (,$(filter $(DEB_HOST_ARCH), amd64 i386 powerpc powerpcspe))
 	# only activate after testing; hangs several tests.
@@ -1157,12 +1172,17 @@ ifeq ($(with_check),yes)
     endif
 
     ifneq (,$(filter zero, $(alternate_vms)))
+      ifneq (,$(filter $(DEB_HOST_ARCH), amd64 i386))
+	# only activate after testing
+	with_mauve_check += zero
+      endif
       ifneq (,$(filter $(DEB_HOST_ARCH), arm64 amd64 i386))
 	# only activate after testing; hangs several tests.
 	with_jtreg_check += zero
       endif
     endif
 
+    with_mauve_check =
 endif
 
 # these are best guesses depending on the architecture and the build machines
@@ -1193,14 +1213,14 @@ endif
 build_stamps +=  stamps/jtreg-check-default
 
 ifeq (0,1)
-build_stamps +=  stamps/jtreg-check-default
-build_stamps += $(if $(filter jamvm, $(alternate_vms)),stamps/jtreg-check-jamvm)
-build_stamps += $(if $(filter zero, $(alternate_vms)),stamps/jtreg-check-zero)
+build_stamps +=  stamps/mauve-check-default stamps/jtreg-check-default
+build_stamps += $(if $(filter jamvm, $(alternate_vms)),stamps/mauve-check-jamvm stamps/jtreg-check-jamvm)
+build_stamps += $(if $(filter zero, $(alternate_vms)),stamps/mauve-check-zero stamps/jtreg-check-zero)
 ifneq (,$(filter shark, $(alternate_vms)))
   ifneq (,$(filter $(DEB_HOST_ARCH),$(altshark_archs)))
-    build_stamps += stamps/jtreg-check-shark
+    build_stamps += stamps/mauve-check-shark stamps/jtreg-check-shark
   else
-    build_stamps += stamps/jtreg-check-zero
+    build_stamps += stamps/mauve-check-zero stamps/jtreg-check-zero
   endif
 endif
 endif
@@ -1288,6 +1308,74 @@ endif
 XVFB_RUN_CMD = xvfb-run -a -e $(CURDIR)/test/xvfb-run.log -s "-extension GLX"
 ifneq (,$(wildcard /usr/bin/$(with_wm)))
   XVFB_RUN_CMD += $(CURDIR)/bin/my-jtreg-run
+endif
+
+stamps/mauve-check-default: stamps/build stamps/xvfb-check
+	$(MAKE) -f debian/rules mauve-run-check VMNAME=$(default_vm) VMARGS=
+	touch $@
+
+stamps/mauve-check-jamvm: stamps/xvfb-check
+	$(MAKE) -f debian/rules mauve-run-check VMNAME=jamvm VMARGS='-vmarg -jamvm'
+	touch $@
+
+stamps/mauve-check-shark: stamps/xvfb-check
+	$(MAKE) -f debian/rules mauve-run-check VMNAME=shark VMARGS='-vmarg -shark'
+	touch $@
+
+stamps/mauve-check-zero: stamps/xvfb-check
+	$(MAKE) -f debian/rules mauve-run-check VMNAME=zero VMARGS='-vmarg -zero'
+	touch $@
+
+stamps/mauve-build: stamps/build
+	rm -rf build/mauve
+	mkdir -p build/mauve
+ifeq ($(with_mauve_check),yes)
+	tar -x -C build -f /usr/src/mauve.tar.gz
+	cd build/mauve \
+	    && aclocal \
+	    && automake \
+	    && autoconf \
+	    && PATH=$(CURDIR)/build/$(sdkimg)/bin:$$PATH \
+		./configure --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE)
+	PATH=$(CURDIR)/build/$(sdkimg)/bin:$$PATH $(MAKE) -C build/mauve
+endif
+	touch $@
+
+stamps/mauve-check: stamps/build stamps/mauve-build stamps/xvfb-check
+
+mauve-run-check:
+	rm -rf build/mauve build/mauve-$(VMNAME)
+ifneq (,$(filter $(VMNAME), $(with_mauve_check)))
+	tar -x -C build -f /usr/src/mauve.tar.gz
+	mv build/mauve build/mauve-$(VMNAME)
+	cd build/mauve-$(VMNAME) \
+	    && aclocal \
+	    && automake \
+	    && autoconf \
+	    && PATH=$(CURDIR)/build/$(sdkimg)/bin:$$PATH ./configure \
+		--host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE)
+	PATH=$(CURDIR)/build/$(sdkimg)/bin:$$PATH $(MAKE) -C build/mauve-$(VMNAME)
+
+	if [ -f bin/my-xvfb-run ]; then \
+	  cd build/mauve-$(VMNAME) && \
+	    JAVA_HOME=$(CURDIR)/build/$(sdkimg) \
+	    PATH=$(CURDIR)/build/$(sdkimg)/bin:$$PATH \
+		time /bin/sh $(CURDIR)/bin/my-xvfb-run java Harness \
+		    -vm $(CURDIR)/build/$(sdkimg)/bin/java \
+		    $(VMARGS) \
+		    -file $(CURDIR)/debian/mauve_tests \
+		    -timeout 30000 2>&1 \
+		| tee mauve_output-$(VMNAME); \
+	else \
+	  echo "mauve testsuite not run for this build (xvfb failures)" \
+	    > build/mauve-$(VMNAME)/mauve_output-$(VMNAME); \
+	  cat test/xvfb-run.log >> build/mauve-$(VMNAME)/mauve_output-$(VMNAME); \
+	fi
+	@sleep 5
+else
+	mkdir -p build/mauve-$(VMNAME)
+	echo "mauve testsuite not run for this build" \
+	  > build/mauve-$(VMNAME)/mauve_output-$(VMNAME)
 endif
 
 stamps/jtreg-check-default: stamps/build stamps/xvfb-check
@@ -2078,6 +2166,8 @@ shlibdeps_ld_path =$(absarchdir):$(absarchdir)/client:$(absarchdir)/server:$(abs
 # pass vm name as first argument
 define install_test_results
 	mkdir -p $(d_jdk)/usr/share/doc/$(p_jrehl)/test-$(DEB_HOST_ARCH)
+#	-cp mauve-$(1)/mauve_output-$(1) \
+#	  $(d_jdk)/usr/share/doc/$(p_jrehl)/test-$(DEB_HOST_ARCH)/mauve_output-$(1).log
 	-cp jtreg_output-$(1) \
 	  $(d_jdk)/usr/share/doc/$(p_jrehl)/test-$(DEB_HOST_ARCH)/jtreg_output-$(1).log
 	-cp test/jtreg-summary-$(1).log test/check-*-$(1).log \
@@ -2113,14 +2203,14 @@ ifneq (,$(filter zero, $(alternate_vms)))
 endif
 # FIXME: desktop and menu files not ready for multiarch. #658321
 ifeq (,$(DEB_HOST_MULTIARCH))
-	dh_installmenu -s $(nodemo) $(nojrec) $(nojrej) $(nojrez)
+	dh_installmenu -s $(nodemo) $(nojrej) $(nojrez)
 endif
-	-dh_icons -s $(nodemo) $(nojrec) $(nojrej) $(nojrez) \
-		|| dh_iconcache -s $(nodemo) $(nojrec) $(nojrej) $(nojrez)
-#	dh_installdebconf -s $(nodemo) $(nojrec) $(nojrej) $(nojrez)
-	dh_link -s $(nodemo) $(nojrec) $(nojrej) $(nojrez)
+	-dh_icons -s $(nodemo) $(nojrej) $(nojrez) \
+		|| dh_iconcache -s $(nodemo) $(nojrej) $(nojrez)
+#	dh_installdebconf -s $(nodemo) $(nojrej) $(nojrez)
+	dh_link -s $(nodemo) $(nojrej) $(nojrez)
 	$(if $(filter $(dh_version), 5 6 7 8),NADA=,DH_COMPAT=9) dh_strip -s \
-		$(nodemo) $(nojrec) $(nojrej) $(nojrez) \
+		$(nodemo) $(nojrej) $(nojrez) \
 		-Xlibjvm.so -X.debuginfo --dbg-package=$(p_dbg)
 
 ifeq (,$(findstring nostrip, $(DEB_BUILD_OPTIONS)))
@@ -2151,32 +2241,32 @@ ifeq (,$(findstring nostrip, $(DEB_BUILD_OPTIONS)))
 	done
 endif
 
-	dh_compress -s $(nodemo) $(nojrec) $(nojrej) $(nojrez) -Xexamples -Xdemo -Xpackage-list
-	dh_fixperms -s $(nodemo) $(nojrec) $(nojrej) $(nojrez)
+	dh_compress -s $(nodemo) $(nojrej) $(nojrez) -Xexamples -Xdemo -Xpackage-list
+	dh_fixperms -s $(nodemo) $(nojrej) $(nojrez)
 	dh_makeshlibs -p$(p_jrehl) -p$(p_jre)
-	dh_shlibdeps -s $(nodemo) $(nojrec) $(nojrej) $(nojrez) -L $(p_jrehl) \
+	dh_shlibdeps -s $(nodemo) $(nojrej) $(nojrez) -L $(p_jrehl) \
 		-l$(shlibdeps_ld_path) \
 		--
-	dh_installdeb -s $(nodemo) $(nojrec) $(nojrej) $(nojrez)
-	dh_gencontrol -s $(nodemo) $(nojrec) $(nojrej) $(nojrez) \
+	dh_installdeb -s $(nodemo) $(nojrej) $(nojrez)
+	dh_gencontrol -s $(nodemo) $(nojrej) $(nojrez) \
 		-- $(control_vars)
-	dh_md5sums -s $(nodemo) $(nojrec) $(nojrej) $(nojrez)
+	dh_md5sums -s $(nodemo) $(nojrej) $(nojrez)
 	: # FIXME: something seems to hang here ...
 	-ps afx
 	NO_PKG_MANGLE=1 \
-	dh_builddeb -s $(nodemo) $(nojrec) $(nojrej) $(nojrez) #$(bd_options)
+	dh_builddeb -s $(nodemo) $(nojrej) $(nojrez) #$(bd_options)
 
 is_release		=
 is_release		= yes
 hg_project		= jdk8u
-hg_tag			= jdk8u111-b14
+hg_tag			= jdk8u121-b13
 package_version		= $(subst jdk,,$(hg_tag))
 ifneq ($(is_release),yes)
   package_version	:= $(subst -,~,$(package_version))
 endif
 hg_url			= http://hg.openjdk.java.net/jdk8u/$(hg_project)
 hg_project_aarch64	= jdk8u
-hg_tag_aarch64		= aarch64-jdk8u111-b16
+hg_tag_aarch64		= aarch64-jdk8u112-b16
 hg_url_aarch64		= http://hg.openjdk.java.net/aarch64-port/$(hg_project_aarch64)
 origdir = ../openjdk-8-$(package_version).orig
 get-orig:
