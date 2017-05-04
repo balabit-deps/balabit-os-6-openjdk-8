@@ -54,7 +54,9 @@ Provides: java2-runtime-headless,
   java5-runtime-headless, java6-runtime-headless,
   java7-runtime-headless, java8-runtime-headless,
   ${defaultvm:Provides}, ${jvm:Provides}
-Breaks: oracle-java8-installer (<< 8u77+8u77arm-1)
+Breaks: oracle-java8-installer (<< 8u77+8u77arm-1),
+  tzdata-java,
+  ca-certificates-java (<< 20160321~)
 Description: OpenJDK Java runtime, using ${vm:Name} (headless)
  Minimal Java runtime - needed for executing non GUI Java programs,
  using ${vm:Name}.

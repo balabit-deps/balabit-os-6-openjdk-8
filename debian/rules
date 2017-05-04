@@ -149,12 +149,15 @@ endif
 
 any_archs = alpha amd64 armel armhf arm64 i386 ia64 mips mipsel mips64 mips64el powerpc powerpcspe ppc64 ppc64el m68k sh4 sparc sparc64 s390x x32 kfreebsd-i386 kfreebsd-amd64
 
-ifeq (,$(filter $(distrel),squeeze lucid))
+ifeq (,$(filter $(distrel),squeeze lucid sid stretch))
   jamvm_archs = amd64 armel armhf i386 powerpc kfreebsd-i386 kfreebsd-amd64 mips mipsel
 endif
 ifeq (,$(filter $(distrel),wheezy squeeze lucid))
   jamvm_defaults =
 endif
+
+# disabled, hotspot updates tend to break it too often ...
+#jamvm_archs =
 
 altshark_archs = powerpc ppc64 ppc64el
 # Shark build but just crash
@@ -199,8 +202,8 @@ OPENJDK_VERSION = jdk$(shortver)u$(updatever)-$(buildver)
 
 # FIXME: ftbfs with -Werror=format-security
 dpkg_buildflags_hs = \
-	DEB_CFLAGS_MAINT_STRIP="-O2 -Werror=format-security" \
-	DEB_CXXFLAGS_MAINT_STRIP="-O2 -Werror=format-security"
+	DEB_CFLAGS_MAINT_STRIP="-O2 -O3 -Werror=format-security" \
+	DEB_CXXFLAGS_MAINT_STRIP="-O2 -O3 -Werror=format-security"
 # jdk/make/CompileDemos.gmk (SetupJVMTIDemo) doesn't like commas in flags
 dpkg_buildflags_hs += \
 	DEB_LDFLAGS_MAINT_STRIP="-Wl,-z,relro -Wl,-Bsymbolic-functions" \
@@ -215,7 +218,7 @@ export EXTRA_LDFLAGS_HS  := $(shell $(dpkg_buildflags_hs) --get LDFLAGS)
 # Don't overwrite JDK opt level :
 # 1) with forced -03, it cause wrong Math.* computations, see #679292 and #678228
 # 2) JDK already use it's own OPTIMIZATION_LEVEL variable for each module
-dpkg_buildflags_jdk = DEB_CFLAGS_MAINT_STRIP="-O2" DEB_CXXFLAGS_MAINT_STRIP="-O2"
+dpkg_buildflags_jdk = DEB_CFLAGS_MAINT_STRIP="-O2 -O3" DEB_CXXFLAGS_MAINT_STRIP="-O2 -O3"
 dpkg_buildflags_jdk += dpkg-buildflags
 export EXTRA_CPPFLAGS_JDK := $(shell $(dpkg_buildflags_jdk) --get CPPFLAGS)
 export EXTRA_CFLAGS_JDK   := $(shell $(dpkg_buildflags_jdk) --get CFLAGS) $(shell $(dpkg_buildflags_jdk) --get CPPFLAGS)
@@ -298,7 +301,7 @@ endif
 with_nss = yes
 with_tzdata =
 
-ifneq (,$(filter $(distrel),wheezy))
+ifneq (,$(filter $(distrel),squeeze wheezy lucid precise))
   with_check =
 else
   bd_jtreg = jtreg,
@@ -388,10 +391,14 @@ COMMON_PATCHES = \
 	8141491.diff \
 	s390x-thread-stack-size.diff \
 	jdk-getAccessibleValue.diff \
+	compiler-flags.diff \
 	openjdk-ppc64el-S8170153.patch \
 	jdk-ppc64el-S8170153.patch \
 	jdk-841269-filechooser.patch \
+	8164293.diff \
+	jdk-ppc64el-S8165231.diff \
 
+#	jdk-derived-font-size.diff \
 # FIXME: update patches
 	#accessible-toolkit.patch # update for 8
 
@@ -416,12 +423,6 @@ ifeq (,$(filter $(DEB_HOST_ARCH),$(hotspot_aarch64_archs)))
 	hotspot-powerpcspe.diff \
 	zero-sh.diff
 # FIXME	zero-opt.diff
-else
-  # aarch64 hotspot is still 8u112-b16
-  COMMON_PATCHES += \
-	sec-webrev-8u121-aarch64-hotspot-8159507.patch \
-	sec-webrev-8u121-aarch64-hotspot-8161218.patch \
-	sec-webrev-8u121-aarch64-hotspot-8167104.patch
 endif
 
 # FIXME needs an update:
@@ -744,7 +745,7 @@ dlopen_hl_depends = \
 	libcups2, liblcms2-2,
 ifneq (,$(filter $(distrel),squeeze lucid))
   dlopen_hl_depends += libjpeg62,
-else ifneq (,$(filter $(distrel), jessie sid))
+else ifneq (,$(filter $(distrel), jessie stretch sid))
   dlopen_hl_depends += libjpeg62-turbo,
 else
   dlopen_hl_depends += libjpeg8,
@@ -762,18 +763,8 @@ ifneq ($(with_nss),no)
 endif
 dlopen_hl_recommends =
 dlopen_jre_depends = \
-	libgtk2.0-0, libxrandr2, libxinerama1, libgl1-mesa-glx | libgl1
+	libglib2.0-0 (>= 2.24), libgtk2.0-0 (>= 2.14), libxrandr2, libxinerama1, libgl1-mesa-glx | libgl1
 dlopen_jre_recommends =
-# these are not yet ready for multiarch
-ifneq (,$(DEB_HOST_MULTIARCH))
-  ifneq (,$(filter $(distrel),jessie wheezy squeeze precise trusty vivid wily))
-    dlopen_jre_recommends += , libgnome2-0, libgnomevfs2-0, libgconf2-4
-  else
-    dlopen_jre_recommends += , libgnome-2-0, libgnomevfs2-0, libgconf-2-4
-  endif
-else
-  dlopen_jre_depends += , libgnome2-0, libgnomevfs2-0, libgconf2-4
-endif
 
 plugin_name = IcedTeaPlugin.so
 browser_plugin_dirs = mozilla
@@ -1193,7 +1184,7 @@ else
   JTREG_OPTIONS = -timeout:3
 endif
 
-ifeq (,$(filter $(distrel),wheezy precise trusty))
+ifeq (,$(filter $(distrel),wheezy trusty))
   JTREG_OPTIONS += -conc:auto
 endif
 
@@ -1385,7 +1376,7 @@ stamps/jtreg-check-default: stamps/build stamps/xvfb-check
 	touch $@
 
 stamps/jtreg-check-jamvm: stamps/build stamps/xvfb-check
-	  $(MAKE) -f debian/rules jtreg-run-check VMNAME=jamvm VMARGS='-vmoption:-jamvm' \
+	$(MAKE) -f debian/rules jtreg-run-check VMNAME=jamvm VMARGS='-vmoption:-jamvm' \
 		TEST_SUITES='hotspot langtools'
 	touch $@
 
@@ -1612,6 +1603,8 @@ endif
 
 ifneq (,$(filter $(DEB_HOST_ARCH), kfreebsd-amd64 kfreebsd-i386))
 	cp -a $(d)/$(basedir)/include/bsd $(d)/$(basedir)/include/linux
+	: # Easy fix for #851053
+	mv $(d)/$(basedir)/jre/lib/$(archdir)/jspawnhelper $(d)/$(basedir)/jre/lib/
 endif
 
 	chmod -R u+w $(d)
@@ -2111,6 +2104,18 @@ ifeq ($(with_systemtap),yes FIXME)
 	cp -p build/tapset/hotspot.stp $(d_jrehl)/usr/share/systemtap/tapset/
 endif
 
+	: # OpenJDK Stack Unwinder and Frame Decorator
+ifneq (,$(filter $(DEB_HOST_ARCH),amd64 kfreebsd-amd64))
+	mkdir -p $(d_jrehl)/usr/share/gdb/auto-load/$(basedir)/jre/lib/$(archdir)/server
+	cp debian/dbg8.py \
+	  $(d_jrehl)/usr/share/gdb/auto-load/$(basedir)/jre/lib/$(archdir)/server/libjvm.so-gdb.py
+  ifneq (,$(filter zero, $(alternate_vms)))
+	mkdir -p $(d_jrez)/usr/share/gdb/auto-load/$(basedir)/jre/lib/$(archdir)/zero
+	ln -sf ../server/libjvm.so-gdb.py \
+	  $(d_jrez)/usr/share/gdb/auto-load/$(basedir)/jre/lib/$(archdir)/zero/libjvm.so
+  endif
+endif
+
 ifeq (0,1)
 	: # Install stuff to generate font config and timezone files.
 	mkdir -p $(d_jrehl)/$(commonbasedir)/jre/lib
@@ -2259,14 +2264,14 @@ endif
 is_release		=
 is_release		= yes
 hg_project		= jdk8u
-hg_tag			= jdk8u121-b13
+hg_tag			= jdk8u131-b11
 package_version		= $(subst jdk,,$(hg_tag))
 ifneq ($(is_release),yes)
   package_version	:= $(subst -,~,$(package_version))
 endif
 hg_url			= http://hg.openjdk.java.net/jdk8u/$(hg_project)
 hg_project_aarch64	= jdk8u
-hg_tag_aarch64		= aarch64-jdk8u112-b16
+hg_tag_aarch64		= aarch64-jdk8u131-b12
 hg_url_aarch64		= http://hg.openjdk.java.net/aarch64-port/$(hg_project_aarch64)
 origdir = ../openjdk-8-$(package_version).orig
 get-orig:

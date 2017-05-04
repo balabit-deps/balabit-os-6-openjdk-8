@@ -1,27 +1,89 @@
-openjdk-8 (8u121-b13-0ubuntu1.16.04.2) xenial-security; urgency=medium
+openjdk-8 (8u131-b11-0ubuntu1.16.04.2) xenial-security; urgency=medium
+
+  * Re-enable jamvm.
+
+ -- Tiago Stürmer Daitx <tiago.daitx@canonical.com>  Thu, 04 May 2017 21:07:24 +0000
+
+openjdk-8 (8u131-b11-0ubuntu1.16.04.1) xenial-security; urgency=medium
 
   * Backport to 16.04.
 
- -- Tiago Stürmer Daitx <tiago.daitx@canonical.com>  Mon, 23 Jan 2017 11:23:44 +0000
+ -- Tiago Stürmer Daitx <tiago.daitx@canonical.com>  Tue, 02 May 2017 02:51:55 +0000
 
-openjdk-8 (8u121-b13-0ubuntu1.16.10.2) yakkety-security; urgency=medium
+openjdk-8 (8u131-b11-0ubuntu1.17.04.1) zesty-security; urgency=medium
 
+  * Update to 8u131-b11, Hotspot 8u112-b12 for AArch64.
+  * Security fixes:
+    - S8167110, CVE-2017-3514: Windows peering issue.
+    - S8165626, CVE-2017-3512: Improved window framing.
+    - S8163528, CVE-2017-3511: Better library loading.
+    - S8169011, CVE-2017-3526: Resizing XML parse trees.
+    - S8163520, CVE-2017-3509: Reuse cache entries.
+    - S8171533, CVE-2017-3544: Better email transfer.
+    - S8170222, CVE-2017-3533: Better transfers of files.
+    - S8171121, CVE-2017-3539: Enhancing jar checking.
+  * d/p/jdk-ppc64el-S8165231.diff: fixes java.nio.Bits.unaligned() on 
+    ppc64el. LP: #1677612.
   * debian/buildwatch.sh: updated to stop it if no 'make' process is running,
     as it probably means that the build failed - otherwise buildwatch keeps
     the builder alive until it exits after the timer (3 hours by default)
     expires.
-  * debian/rules: updated jtreg tests to use agentvm and auto concurrency.
 
- -- Tiago Stürmer Daitx <tiago.daitx@canonical.com>  Mon, 23 Jan 2017 11:22:24 +0000
+ -- Tiago Stürmer Daitx <tiago.daitx@canonical.com>  Tue, 02 May 2017 02:51:42 +0000
 
-openjdk-8 (8u121-b13-0ubuntu1.16.04.1) xenial-security; urgency=medium
+openjdk-8 (8u121-b13-4.1) unstable; urgency=medium
 
-  * Backport to 16.04.
+  * Non-maintainer upload.
+  * openjdk-8-jre-headless: Add Breaks: tzdata-java to ensure openjdk gets
+    upgraded on dist-upgrades from jessie.  (Closes: #857992)
 
- -- Tiago Stürmer Daitx <tiago.daitx@canonical.com>  Sun, 22 Jan 2017 23:57:12 +0000
+ -- Andreas Beckmann <anbe@debian.org>  Tue, 18 Apr 2017 22:32:33 +0200
 
-openjdk-8 (8u121-b13-0ubuntu1.16.10.1) yakkety-security; urgency=medium
+openjdk-8 (8u121-b13-4) unstable; urgency=medium
 
+  * Drop Recommends on obsolete GNOME libraries so they are not in a
+    default GNOME desktop installation (Simon McVittie). Closes: #850268.
+    - sun.net.spi.DefaultProxySelector prefers libglib2.0-0 (>= 2.24)
+      over obsolete libgconf2-4.
+    - sun.nio.fs.GnomeFileTypeDetector prefers libglib2.0-0 (>= 2.24)
+      over libgnomevfs-2-0.
+    - sun.xawt.awt_Desktop prefers libgtk2.0-0 (>= 2.14) over
+      libgnomevfs2-0.
+  * See the bug report for an analysis why this can be done for releases
+    back to Debian wheezy (7.0) and Ubuntu precise (12.04 LTS).
+
+ -- Matthias Klose <doko@ubuntu.com>  Fri, 03 Mar 2017 18:46:54 +0100
+
+openjdk-8 (8u121-b13-3) unstable; urgency=medium
+
+  * Really don't build the JamVM VM.
+  * Fix 8164293: HotSpot leaking memory in long-running requests.
+    Closes: #853758.
+  * Add OpenJDK Stack Unwinder and Frame Decorator for gdb.
+
+ -- Matthias Klose <doko@ubuntu.com>  Wed, 08 Feb 2017 07:24:13 +0100
+
+openjdk-8 (8u121-b13-2) unstable; urgency=medium
+
+  * Fix libjpeg dependency. Closes: #852378.
+
+ -- Matthias Klose <doko@ubuntu.com>  Tue, 24 Jan 2017 14:22:36 +0100
+
+openjdk-8 (8u121-b13-1) unstable; urgency=high
+
+  * Update to 8u121-b13, Hotspot 8u112-b16 for AArch64.
+
+  [ Matthias Klose ]
+  * Build using the default flags (POWER8) on ppc64el.
+  * Add a breaks for ca-certificates-java (<< 20160321~). Closes: #851667.
+  * Stop building JamVM for the stretch release, the VM is not working
+    with recent OpenJDK 8 updates. Closes: #841229, #842132.
+  * Fix location of jspawnhelper for KFreeBSD. Closes: #851053.
+
+  [ Tiago Stürmer Daitx ]
+  * debian/rules: add -O3 to DEB_CFLAGS_MAINT_STRIP and
+    DEB_CXXFLAGS_MAINT_STRIP for dpkg_buildflags_jdk and
+    dpkg_buildflags_hs as ppc64le has -O3 by default. LP: #1640845.
   * Update to 8u121-b13, including security fixes.
     - S8165344, CVE-2017-3272: A protected field can be leveraged into type
       confusion.
@@ -56,19 +118,16 @@ openjdk-8 (8u121-b13-0ubuntu1.16.10.1) yakkety-security; urgency=medium
       dispatch HTTP GET requests where the invoker does not have permission.
     - S8165071, CVE-2016-2183: 3DES can be exploited for block collisions when
       long running sessions are allowed.
-  * debian/patches/8132051-zero.diff: superseeded by upstream fix S8154210;
-    deleted.
-  * debian/patches/hotspot-JDK-8158260-ppc64el.patch: applied upstream;
-    deleted.
-  * debian/patches/6926048.diff: already applied upstream; deleted.
-  * debian/patches/jdk-ppc64el-S8170153.patch: improve StrictMath performance
-    on ppc64el. LP: #1646927.
-  * debian/patches/openjdk-ppc64el-S8170153.patch: same.
-  * debian/patches/jdk-841269-filechooser.patch: fix FileChooser behavior when
-    displaying links to non-existant files. Closes: #841269.
+  * d/p/8132051-zero.diff: Superseeded by upstream fix S8154210; removed.
+  * d/p/hotspot-JDK-8158260-ppc64el.patch: Applied upstream; removed.
+  * d/p/6926048.diff: Already applied upstream; removed.
+  * d/p/jdk-ppc64el-S8170153.patch, d/p/openjdk-ppc64el-S8170153.patch: Improve
+    StrictMath performance on ppc64el. LP: #1646927.
+  * d/p/jdk-841269-filechooser.patch: Fix FileChooser behavior when displaying
+    links to non-existant files. Closes: #841269.
   * Refreshed various patches.
 
- -- Tiago Stürmer Daitx <tiago.daitx@canonical.com>  Tue, 17 Jan 2017 09:16:32 +0000
+ -- Matthias Klose <doko@ubuntu.com>  Mon, 23 Jan 2017 11:03:55 +0100
 
 openjdk-8 (8u111-b14-3) unstable; urgency=high
 
