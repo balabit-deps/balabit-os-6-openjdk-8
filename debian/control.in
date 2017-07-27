@@ -1,17 +1,19 @@
 Source: @basename@
 Section: java
 Priority: optional
-Maintainer: OpenJDK Team <openjdk@lists.launchpad.net>
+Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+XSBC-Original-Maintainer: OpenJDK Team <openjdk@lists.launchpad.net>
 Uploaders: Matthias Klose <doko@ubuntu.com>
 Build-Depends: debhelper (>= 9), quilt, m4, lsb-release, zip, unzip,
-  sharutils, gawk, cpio, pkg-config, procps, wdiff, @bd_fastjar@
+  sharutils, gawk, cpio, pkg-config, procps, wdiff, tzdata,
+  @bd_fastjar@
   @bd_autotools@ @bd_ant@ @bd_jamvm@
   @bd_gcc@
   @bd_bootstrap@
   @bd_openjdk@
   @bd_zero@ @bd_shark@
   @bd_syslibs@ @bd_pulsejava@ @bd_systemtap@
-  @bd_nss@ @bd_tzdata@
+  @bd_nss@
   @bd_mauve@ @bd_jtreg@ @bd_xvfb@
   time, @bd_cross@
 Standards-Version: 3.9.8
@@ -30,6 +32,7 @@ Provides: java-sdk-headless, java2-sdk-headless,
   java5-sdk-headless, java6-sdk-headless,
   java7-sdk-headless, java8-sdk-headless,
 Replaces: @basename@-jdk (<< 8u72-b15-4),
+Breaks: ${jrehl:Breaks}
 Description: OpenJDK Development Kit (JDK) (headless)
  OpenJDK is a development environment for building applications,
  applets, and components using the Java programming language.
@@ -55,7 +58,6 @@ Provides: java2-runtime-headless,
   java7-runtime-headless, java8-runtime-headless,
   ${defaultvm:Provides}, ${jvm:Provides}
 Breaks: oracle-java8-installer (<< 8u77+8u77arm-1),
-  tzdata-java,
   ca-certificates-java (<< 20160321~)
 Description: OpenJDK Java runtime, using ${vm:Name} (headless)
  Minimal Java runtime - needed for executing non GUI Java programs,

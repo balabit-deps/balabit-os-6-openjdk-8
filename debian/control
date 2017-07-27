@@ -1,17 +1,19 @@
 Source: openjdk-8
 Section: java
 Priority: optional
-Maintainer: OpenJDK Team <openjdk@lists.launchpad.net>
+Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+XSBC-Original-Maintainer: OpenJDK Team <openjdk@lists.launchpad.net>
 Uploaders: Matthias Klose <doko@ubuntu.com>
 Build-Depends: debhelper (>= 9), quilt, m4, lsb-release, zip, unzip,
-  sharutils, gawk, cpio, pkg-config, procps, wdiff, fastjar (>= 2:0.96-0ubuntu2),
+  sharutils, gawk, cpio, pkg-config, procps, wdiff, tzdata,
+  fastjar (>= 2:0.96-0ubuntu2),
   autoconf (>= 2.69), automake, autotools-dev, ant, ant-optional, libtool,
   g++-5,
   openjdk-8-jdk | openjdk-7-jdk,
   libxtst-dev, libxi-dev, libxt-dev, libxaw7-dev, libxrender-dev, libcups2-dev, libasound2-dev, liblcms2-dev, libfreetype6-dev (>= 2.2.1), libgtk2.0-dev, libxinerama-dev, libkrb5-dev, xsltproc, libpcsclite-dev,
   libffi-dev, 
   zlib1g-dev, libattr1-dev, libpng-dev, libjpeg-dev, libgif-dev, libpulse-dev (>= 0.9.12) [!alpha], systemtap-sdt-dev [!sh4],
-  libnss3-dev (>= 2:3.17.1), tzdata,
+  libnss3-dev (>= 2:3.17.1),
   mauve, jtreg, xvfb, xauth, xfonts-base, libgl1-mesa-dri [!x32], twm | metacity, twm | dbus-x11, x11-xkb-utils,
   time, openjdk-8-jdk-headless <cross>, dpkg-dev (>= 1.17.14),
 Standards-Version: 3.9.8
@@ -30,6 +32,7 @@ Provides: java-sdk-headless, java2-sdk-headless,
   java5-sdk-headless, java6-sdk-headless,
   java7-sdk-headless, java8-sdk-headless,
 Replaces: openjdk-8-jdk (<< 8u72-b15-4),
+Breaks: ${jrehl:Breaks}
 Description: OpenJDK Development Kit (JDK) (headless)
  OpenJDK is a development environment for building applications,
  applets, and components using the Java programming language.
@@ -49,13 +52,12 @@ Recommends: ${dlopenhl:Recommends}, ${jamvm:Recommends}
 Suggests: ${jamvm:Suggests},
   libnss-mdns,
   fonts-dejavu-extra,
-  fonts-ipafont-gothic, fonts-ipafont-mincho, ttf-wqy-microhei | ttf-wqy-zenhei, fonts-indic,
+  fonts-ipafont-gothic, fonts-ipafont-mincho, fonts-wqy-microhei, fonts-wqy-zenhei, fonts-indic,
 Provides: java2-runtime-headless,
   java5-runtime-headless, java6-runtime-headless,
   java7-runtime-headless, java8-runtime-headless,
   ${defaultvm:Provides}, ${jvm:Provides}
 Breaks: oracle-java8-installer (<< 8u77+8u77arm-1),
-  tzdata-java,
   ca-certificates-java (<< 20160321~)
 Description: OpenJDK Java runtime, using ${vm:Name} (headless)
  Minimal Java runtime - needed for executing non GUI Java programs,
@@ -169,7 +171,7 @@ Description: Java runtime based on OpenJDK (debugging symbols)
  from the IcedTea project.
 
 Package: openjdk-8-jre-jamvm
-Architecture: amd64 armel armhf i386 powerpc kfreebsd-i386 kfreebsd-amd64 mips mipsel
+Architecture: amd64 armhf i386 powerpc
 Multi-Arch: same
 Priority: extra
 Pre-Depends: ${dpkg:Depends}

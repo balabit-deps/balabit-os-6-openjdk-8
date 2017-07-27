@@ -1,16 +1,93 @@
-openjdk-8 (8u131-b11-0ubuntu1.16.04.2) xenial-security; urgency=medium
+openjdk-8 (8u131-b11-2ubuntu1.16.04.3) xenial-security; urgency=medium
 
-  * Re-enable jamvm.
+  * Fix regression introduced by security fix S8169392. LP: #1707082.
+    - debian/rules: apply jdk-S8184993-fix-S8169392-regression.patch.
+    - debian/patches/jdk-S8184993-fix-S8169392-regression.patch: upstream
+      fix for the regression.
 
- -- Tiago Stürmer Daitx <tiago.daitx@canonical.com>  Thu, 04 May 2017 21:07:24 +0000
+ -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Thu, 27 Jul 2017 21:26:44 +0000
 
-openjdk-8 (8u131-b11-0ubuntu1.16.04.1) xenial-security; urgency=medium
+openjdk-8 (8u131-b11-2ubuntu1.16.04.2) xenial-security; urgency=medium
 
   * Backport to 16.04.
 
- -- Tiago Stürmer Daitx <tiago.daitx@canonical.com>  Tue, 02 May 2017 02:51:55 +0000
+ -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Fri, 21 Jul 2017 23:33:27 +0000
 
-openjdk-8 (8u131-b11-0ubuntu1.17.04.1) zesty-security; urgency=medium
+openjdk-8 (8u131-b11-2ubuntu1.17.04.2) zesty-security; urgency=medium
+
+  * patches/hotspot-ppc64el-S8181055-use-numa-v2-api.patch: mbind invalid
+    argument message is still seen after S8175813; use numa_interleave_memory
+    v2 api when available. LP: #1705763.
+
+ -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Fri, 21 Jul 2017 23:26:25 +0000
+
+openjdk-8 (8u131-b11-2ubuntu1.16.04.1) xenial-security; urgency=medium
+
+  * Backport to 16.04.
+
+ -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Tue, 18 Jul 2017 04:36:41 +0000
+
+openjdk-8 (8u131-b11-2ubuntu1.17.04.1) zesty-security; urgency=medium
+
+  * Security fixes from 8u141:
+    - CVE-2017-10102, S8163958: Improved garbage collection.
+    - CVE-2017-10053, S8169209: Improved image post-processing steps.
+    - CVE-2017-10067, S8169392: Additional jar validation steps.
+    - CVE-2017-10081, S8170966: Right parenthesis issue.
+    - CVE-2017-10078, S8171539: Better script accessibility for JavaScript.
+    - CVE-2017-10087, S8172204: Better Thread Pool execution.
+    - CVE-2017-10089, S8172461: Service Registration Lifecycle.
+    - CVE-2017-10090, S8172465: Better handling of channel groups.
+    - CVE-2017-10096, S8172469: Transform Transformer Exceptions.
+    - CVE-2017-10101, S8173286: Better reading of text catalogs.
+    - CVE-2017-10107, S8173697: Less Active Activations.
+    - CVE-2017-10074, S8173770: Image conversion improvements.
+    - CVE-2017-10110, S8174098: Better image fetching.
+    - CVE-2017-10108, S8174105: Better naming attribution.
+    - CVE-2017-10109, S8174113: Better sourcing of code.
+    - CVE-2017-10115, S8175106: Higher quality DSA operations.
+    - CVE-2017-10118, S8175110: Higher quality ECDSA operations.
+    - CVE-2017-10116, S8176067: Proper directory lookup processing.
+    - CVE-2017-10135, S8176760: Better handling of PKCS8 material.
+    - CVE-2017-10176, S8178135: Additional elliptic curve support.
+    - CVE-2017-10193, S8179101: Improve algorithm constraints implementation.
+    - CVE-2017-10198, S8179998: Clear certificate chain connections.
+    - S8174770: Check registry registration location.
+    - S8174873: Improved certificate procesing.
+    - S8176055: JMX diagnostic improvements.
+    - S8176536: Improved algorithm constraints checking.
+    - S8181420: PPC: Image conversion improvements.
+    - S8182054: Improve wsdl support.
+    - S8184185: Rearrange MethodHandle arrangements.
+  * debian/rules:
+    - enable apport hook on Ubuntu and derivatives only.
+    - remove with_zenhai logic.
+    - remove unused with_tzdata logic, move tzdata build dependency
+      to control.in.
+    - add Breaks:tzdata-java except for wheezy, jessie or trusty.
+    - re-enable jamvm for Xenial only.
+    - run debian/control before build so we won't build with a invalid
+      control file.
+    - remove logic to select between ttf or font packages and depend
+      on fonts-wqy-microhei and fonts-wqy-zenhei instead
+  * debian/apport-hook.py: add an apport hook to include conffiles
+    modified by the user on any report and the hs_err log file on
+    crash report only. LP: #1696886.
+  * patches/fontconfig-arphic-uming.diff: only enabled when with_zenhai
+    was false; not required since lenny.
+  * patches/hotspot-ppc64el-S8175813-mbind-invalid-argument.patch: prevent
+    invalid argument message when invoking UseNUMA on a system with 
+    non-consecutive numa topology. LP: #1697348.
+
+ -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Mon, 17 Jul 2017 23:58:18 +0000
+
+openjdk-8 (8u131-b11-2) unstable; urgency=medium
+
+  * Tighten dependency on libatk-wrapper-java-jni. Closes: #862508.
+
+ -- Matthias Klose <doko@ubuntu.com>  Tue, 16 May 2017 14:38:22 -0700
+
+openjdk-8 (8u131-b11-1) unstable; urgency=high
 
   * Update to 8u131-b11, Hotspot 8u112-b12 for AArch64.
   * Security fixes:
@@ -22,14 +99,21 @@ openjdk-8 (8u131-b11-0ubuntu1.17.04.1) zesty-security; urgency=medium
     - S8171533, CVE-2017-3544: Better email transfer.
     - S8170222, CVE-2017-3533: Better transfers of files.
     - S8171121, CVE-2017-3539: Enhancing jar checking.
-  * d/p/jdk-ppc64el-S8165231.diff: fixes java.nio.Bits.unaligned() on 
+
+  [ Tiago Stürmer Daitx ]
+  * d/p/jdk-ppc64el-S8165231.diff: fixes java.nio.Bits.unaligned() on
     ppc64el. LP: #1677612.
   * debian/buildwatch.sh: updated to stop it if no 'make' process is running,
     as it probably means that the build failed - otherwise buildwatch keeps
     the builder alive until it exits after the timer (3 hours by default)
     expires.
 
- -- Tiago Stürmer Daitx <tiago.daitx@canonical.com>  Tue, 02 May 2017 02:51:42 +0000
+  [ Matthias Klose ]
+  * openjdk-8-jre-headless: Add a break for tzdata-java. Closes: #857992.
+  * Use fonts-wqy-microhei and fonts-wqy-zenhei instead of transitional package
+    names. Closes: #859528.
+
+ -- Matthias Klose <doko@ubuntu.com>  Mon, 01 May 2017 19:28:19 +0700
 
 openjdk-8 (8u121-b13-4.1) unstable; urgency=medium
 
