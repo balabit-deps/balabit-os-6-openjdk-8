@@ -8,6 +8,13 @@ import re
 import sys
 from apport.hookutils import *
 
+def si_units(size):
+    for unit in ['KiB', 'MiB', 'GiB']:
+        size /= 1024
+        if size < 1024:
+            break
+    return '{0:.1f} {1}'.format(size, unit)
+
 def add_info(report, ui=None):
     attach_conffiles(report,'openjdk-8-jre-headless', ui=ui)
 
@@ -21,8 +28,19 @@ def add_info(report, ui=None):
             # make sure if exists
             if os.path.exists(path):
                 content = read_file(path)
-                # only attach if smaller than 100 KB
+                # truncate if bigger than 100 KB
                 # see LP: #1696814
-                if sys.getsizeof(content) < 100*1024:
+                max_length = 100*1024
+                if sys.getsizeof(content) < max_length:
                     report['HotspotError'] = content
                     report['Tags'] += ' openjdk-hs-err'
+                else:
+                    report['HotspotError'] = content[:max_length] + \
+                            "\n[truncated by openjdk-8 apport hook]" + \
+                            "\n[max log size is %s, file size was %s]" % \
+                            (si_units(max_length), si_units(sys.getsizeof(content)))
+                    report['Tags'] += ' openjdk-hs-err'
+            else:
+                report['HotspotError'] = "File not found: %s" % path
+        else:
+            report['HotspotError'] = "PID not found in ProcStatus entry."

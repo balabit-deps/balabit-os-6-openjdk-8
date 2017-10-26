@@ -7,7 +7,7 @@ Uploaders: Matthias Klose <doko@ubuntu.com>
 Build-Depends: debhelper (>= 9), quilt, m4, lsb-release, zip, unzip,
   sharutils, gawk, cpio, pkg-config, procps, wdiff, tzdata,
   fastjar (>= 2:0.96-0ubuntu2),
-  autoconf (>= 2.69), automake, autotools-dev, ant, ant-optional, libtool,
+  autoconf (>= 2.69), automake, autotools-dev, ant, ant-optional,
   g++-5,
   openjdk-8-jdk | openjdk-7-jdk,
   libxtst-dev, libxi-dev, libxt-dev, libxaw7-dev, libxrender-dev, libcups2-dev, libasound2-dev, liblcms2-dev, libfreetype6-dev (>= 2.2.1), libgtk2.0-dev, libxinerama-dev, libkrb5-dev, xsltproc, libpcsclite-dev,
@@ -16,7 +16,7 @@ Build-Depends: debhelper (>= 9), quilt, m4, lsb-release, zip, unzip,
   libnss3-dev (>= 2:3.17.1),
   mauve, jtreg, xvfb, xauth, xfonts-base, libgl1-mesa-dri [!x32], twm | metacity, twm | dbus-x11, x11-xkb-utils,
   time, openjdk-8-jdk-headless <cross>, dpkg-dev (>= 1.17.14),
-Standards-Version: 3.9.8
+Standards-Version: 4.1.0
 Homepage: http://openjdk.java.net/
 Vcs-Bzr: http://bazaar.launchpad.net/~openjdk/openjdk/openjdk8
 Vcs-Browser: https://code.launchpad.net/~openjdk/openjdk/openjdk8
@@ -32,7 +32,6 @@ Provides: java-sdk-headless, java2-sdk-headless,
   java5-sdk-headless, java6-sdk-headless,
   java7-sdk-headless, java8-sdk-headless,
 Replaces: openjdk-8-jdk (<< 8u72-b15-4),
-Breaks: ${jrehl:Breaks}
 Description: OpenJDK Development Kit (JDK) (headless)
  OpenJDK is a development environment for building applications,
  applets, and components using the Java programming language.
@@ -43,14 +42,13 @@ Description: OpenJDK Development Kit (JDK) (headless)
 Package: openjdk-8-jre-headless
 Architecture: alpha amd64 armel armhf arm64 i386 ia64 mips mipsel mips64 mips64el powerpc powerpcspe ppc64 ppc64el m68k sh4 sparc sparc64 s390x x32 kfreebsd-i386 kfreebsd-amd64
 Multi-Arch: same
-Pre-Depends: ${dpkg:Depends}, ${multiarch:Depends}
+Pre-Depends: ${dpkg:Depends}
 Depends: ${jredefault:Depends}, ${cacert:Depends},
   ${tzdata:Depends}, ${jcommon:Depends}, ${dlopenhl:Depends},
   ${mountpoint:Depends},
   ${shlibs:Depends}, ${misc:Depends}
-Recommends: ${dlopenhl:Recommends}, ${jamvm:Recommends}
-Suggests: ${jamvm:Suggests},
-  libnss-mdns,
+Recommends: ${dlopenhl:Recommends}
+Suggests: libnss-mdns,
   fonts-dejavu-extra,
   fonts-ipafont-gothic, fonts-ipafont-mincho, fonts-wqy-microhei, fonts-wqy-zenhei, fonts-indic,
 Provides: java2-runtime-headless,
@@ -58,7 +56,7 @@ Provides: java2-runtime-headless,
   java7-runtime-headless, java8-runtime-headless,
   ${defaultvm:Provides}, ${jvm:Provides}
 Breaks: oracle-java8-installer (<< 8u77+8u77arm-1),
-  ca-certificates-java (<< 20160321~)
+  ${jrehl:Breaks}
 Description: OpenJDK Java runtime, using ${vm:Name} (headless)
  Minimal Java runtime - needed for executing non GUI Java programs,
  using ${vm:Name}.
@@ -171,20 +169,19 @@ Description: Java runtime based on OpenJDK (debugging symbols)
  from the IcedTea project.
 
 Package: openjdk-8-jre-jamvm
-Architecture: amd64 armhf i386 powerpc
+Architecture: amd64 i386
 Multi-Arch: same
 Priority: extra
 Pre-Depends: ${dpkg:Depends}
 Depends: openjdk-8-jre-headless (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
-Description: Alternative JVM for OpenJDK, using JamVM
- The package provides an alternative runtime using the JamVM.  This is a
- somewhat faster alternative than the Zero port on architectures like armel,
- mips, mipsel, powerpc.
+Description: Transitional package for obsolete JamVM for OpenJDK
+ JamVM support was removed for recent versions of OpenJDK 8.
  .
- The VM is started with the option `-jamvm'. See the README.Debian for details.
+ This is a transitional package which can be safely removed.
+
 
 Package: openjdk-8-jre-zero
-Architecture: amd64 i386 arm64 ppc64 ppc64el sparc64 kfreebsd-amd64 kfreebsd-i386 
+Architecture: amd64 i386 arm64 ppc64 ppc64el sparc64 armhf kfreebsd-amd64 kfreebsd-i386 
 Multi-Arch: same
 Priority: extra
 Pre-Depends: ${dpkg:Depends}
