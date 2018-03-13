@@ -333,7 +333,6 @@ endif
 # FIXME: 8132051-zero.diff doesn't apply for the default hotspot tarball,
 # resulting in broken zero builds
 COMMON_PATCHES = \
-	gcc6.diff \
 	autoconf-select.diff \
 	hotspot-warn-no-errformat.diff \
 	aarch64.diff \
@@ -348,7 +347,6 @@ COMMON_PATCHES = \
 	hotspot-mips-align.diff \
 	hotspot-no-march-i586.diff \
 	icc_loading_with_symlink.diff \
-	icedtea-4953367.patch \
 	icedtea-override-redirect-compiz.patch \
 	jdk-freetypeScaler-crash.diff \
 	libpcsclite-dlopen.diff \
@@ -377,10 +375,8 @@ COMMON_PATCHES = \
 	s390x-thread-stack-size.diff \
 	jdk-getAccessibleValue.diff \
 	compiler-flags.diff \
-	openjdk-ppc64el-S8170153.patch \
 	jdk-ppc64el-S8170153.patch \
 	jdk-841269-filechooser.patch \
-	8164293.diff \
 	jdk-i18n-pt_BR.diff \
 	jdk-java-nio-bits-unligned-aarch64.diff \
 	jdk-S8165852-overlayfs.patch \
@@ -439,27 +435,19 @@ ifneq (,$(filter $(DEB_HOST_ARCH), $(hotspot_aarch32_archs)))
 	aarch32.diff
 endif
 
-ifneq (,$(filter $(DEB_HOST_ARCH), ppc64 ppc64el))
-  COMMON_PATCHES += \
-	hotspot-ppc64el-S8175813-mbind-invalid-argument.patch \
-	hotspot-ppc64el-S8181055-use-numa-v2-api.patch \
-	hotspot-ppc64el-S8168318-cmpldi.patch \
-	hotspot-ppc64el-S8170328-andis.patch \
-	hotspot-ppc64el-S8145913-montgomery-multiply-intrinsic.patch \
-	hotspot-ppc64el-S8181810-leverage-extrdi.patch
-endif
-
 ifneq (,$(filter $(DEB_HOST_ARCH), kfreebsd-amd64 kfreebsd-i386))
   COMMON_PATCHES += \
 	kfreebsd-support-jdk.diff \
 	kfreebsd-support-hotspot.diff
 endif
 
-# apply 8u151-b12 hotspot patches for aarch32
-ifneq (,$(filter $(DEB_HOST_ARCH),$(hotspot_aarch32_archs)))
+# apply 8u162-b12 hotspot patches to aarch64
+ifneq (,$(filter $(DEB_HOST_ARCH),$(hotspot_aarch64_archs)))
   COMMON_PATCHES += \
-	sec-webrev-8u151-hotspot-8179084.patch \
-	sec-webrev-8u151-hotspot-8180711.patch
+	aarch64-hotspot-8u162-b12.diff
+else
+  COMMON_PATCHES += \
+	zero-hotspot-S819432.patch
 endif
 
 DEFAULT_PATCHES = \
@@ -1043,13 +1031,11 @@ stamps/sound-build: stamps/sound-configure
 unpack: stamps/unpack
 stamps/unpack:
 	rm -rf $(srcdir)
-	tar xf root.tar.xz
-	mv $$(tar tf root.tar.xz | head -1 | sed 's,/.*,,') $(srcdir)
+	mkdir -p $(srcdir)
+	tar -xf root.tar.xz --strip-components=1 -C $(srcdir)
 	chmod +x $(srcdir)/configure
 	for tb in corba jaxp jaxws langtools hotspot jdk nashorn; do \
-	  d=$$(tar tf $$tb.tar.xz | head -1 | sed 's,/.*,,'); \
 	  tar -C $(srcdir) -x -f $$tb.tar.xz; \
-	  mv $(srcdir)/$$d $(srcdir)/$$tb; \
 	done
 # FIXME: do the zero build from the hotspot.tar.gz
 ifneq (,$(filter $(DEB_HOST_ARCH),$(hotspot_aarch64_archs)))
@@ -1184,7 +1170,7 @@ build-indep: build stamps/build-docs
 build: pre-build $(build_stamps)
 	if [ -f buildwatch.pid ]; then \
 	  pid=$$(cat buildwatch.pid); \
-	  kill -1 $$pid || :; sleep 1; kill -9 $$pid || :; \
+	  kill -1 $$pid || :; sleep 10; kill -9 $$pid || :; \
 	fi
 	rm -f buildwatch.pid
 
@@ -1197,7 +1183,8 @@ endif
 	else \
 	  if [ -f buildwatch.pid ]; then \
 	    pid=$$(cat buildwatch.pid); \
-	    kill -1 $$pid || :; sleep 1; kill -9 $$pid || :; \
+	    kill -1 $$pid || :; sleep 10; kill -9 $$pid || :; \
+	    find $(builddir) -type f -name 'hs_err_pid*.log' -print -exec cat -tn {} \;; \
 	  fi; \
 	  false; \
 	fi
@@ -1569,9 +1556,6 @@ endif
 	find $(d)/$(basedir)/man $(d)/$(basedir)/jre/man -type f ! -type l \
 	  | xargs gzip -9v -n
 
-	: # create man directory since the postinst script uses that
-	mkdir -p $(d)/usr/share/man/man1
-
 	: # copy man pages into the jre/man directory
 	mkdir -p $(d)/$(basedir)/jre/man/man1
 	mkdir -p $(d)/$(basedir)/jre/man/ja_JP.UTF-8/man1
@@ -1703,7 +1687,6 @@ endif
 	: # $(p_jrehl).install / $(p_jre).install
 	( \
 	  echo 'etc'; \
-	  echo 'usr/share/man/man1'; \
 	  echo '$(basedir)/jre/lib/jexec'; \
 	  echo '$(basedir)/jre/lib/rt.jar'; \
 	  echo '$(basedir)/jre/lib/security/policy'; \
@@ -2203,20 +2186,21 @@ endif
 is_release		=
 is_release		= yes
 hg_project		= jdk8u
-hg_tag			= jdk8u151-b12
+hg_tag			= jdk8u162-b12
 package_version		= $(subst jdk,,$(hg_tag))
 ifneq ($(is_release),yes)
   package_version	:= $(subst -,~,$(package_version))
 endif
 hg_url			= http://hg.openjdk.java.net/jdk8u/$(hg_project)
 hg_project_aarch64	= jdk8u
-hg_tag_aarch64		= aarch64-jdk8u151-b12
+hg_tag_aarch64		= aarch64-jdk8u161-b16
 hg_url_aarch64		= http://hg.openjdk.java.net/aarch64-port/$(hg_project_aarch64)
 hg_project_aarch32	= jdk8u
-hg_tag_aarch32		= jdk8u144-b01-aarch32-170809
+hg_tag_aarch32		= jdk8u162-b12-aarch32-180220
 hg_url_aarch32		= http://hg.openjdk.java.net/aarch32-port/$(hg_project_aarch32)
-origdir = ../openjdk-8-$(package_version).orig
-get-orig:
+origdir			= ../openjdk-8-$(package_version).orig
+source_date		:= $(shell dpkg-parsechangelog --show-field=Date)
+fetch-orig:
 	mkdir -p $(origdir)
 	wget -O $(origdir)/root.tar.bz2 $(hg_url)/archive/$(hg_tag).tar.bz2
 	for repo in corba jaxp jaxws langtools hotspot jdk nashorn; do \
@@ -2236,7 +2220,7 @@ endif
 
 #	wget -O $(origdir)/icedtea-sound.tar.bz2 \
 #	  http://icedtea.classpath.org/hg/icedtea-sound/archive/tip.tar.bz2
-
+dfsg-orig:
 	: # remove JSON license from THIRD_PARTY_README; no files shipped
 	set -ex; \
 	for repo in \
@@ -2244,29 +2228,30 @@ endif
 	  $(if $(hotspot_aarch32_archs), hotspot-aarch32); \
 	do \
 	  [ -f $(origdir)/$$repo.tar.bz2 ] || continue; \
-	  d=$$(tar tf $(origdir)/$$repo.tar.bz2 | head -1 | sed 's,/.*,,'); \
-	  tar xf $(origdir)/$$repo.tar.bz2; \
-	  find $$d -maxdepth 2 -name THIRD_PARTY_README; \
-	  for f in $$(find $$d -maxdepth 2 -name THIRD_PARTY_README); do \
+	  mkdir -p $$repo; \
+	  tar -xf $(origdir)/$$repo.tar.bz2 --strip-components=1 -C $$repo; \
+	  find $$repo -maxdepth 2 -name THIRD_PARTY_README; \
+	  for f in $$(find $$repo -maxdepth 2 -name THIRD_PARTY_README); do \
 	    awk '/^%% This notice is provided with respect to JSON/ { skip=1 } skip == 0 {print} /^----------/ { skip = 0} ' $$f > $$f.new; \
 	    diff -u $$f $$f.new || true; \
 	    mv $$f.new $$f; \
 	  done; \
 	  case $$repo in jdk) \
-	    rm -v -rf $$d/src/share/native/java/util/zip/zlib-*; \
-	    find $$d/src/share/native/sun/awt/image/jpeg \
+	    rm -v -rf $$repo/src/share/native/java/util/zip/zlib-*; \
+	    find $$repo/src/share/native/sun/awt/image/jpeg \
 	      ! -name imageioJPEG.c ! -name jpegdecoder.c ! -name jinclude.h \
 	      -type f -print -delete; \
-	    rm -v -rf $$d/src/share/native/sun/awt/giflib; \
-	    rm -v -rf $$d/src/share/native/sun/awt/libpng; \
-	    rm -v -f $$d/src/share/native/sun/java2d/cmm/lcms/cms*.c; \
-	    rm -v -f $$d/src/share/native/sun/java2d/cmm/lcms/lcms2*.h; \
-	    rm -v -rf $$d/src/solaris/native/sun/security/smartcardio/MUSCLE; \
+	    rm -v -rf $$repo/src/share/native/sun/awt/giflib; \
+	    rm -v -rf $$repo/src/share/native/sun/awt/libpng; \
+	    rm -v -f $$repo/src/share/native/sun/java2d/cmm/lcms/cms*.c; \
+	    rm -v -f $$repo/src/share/native/sun/java2d/cmm/lcms/lcms2*.h; \
+	    rm -v -rf $$repo/src/solaris/native/sun/security/smartcardio/MUSCLE; \
 	  esac; \
-	  tar cfJ $(origdir)/$$repo.tar.xz $$d; \
-	  rm -rf $$d; \
+	  tar --clamp-mtime --mtime="$(source_date)" -cJf $(origdir)/$$repo.tar.xz $$repo; \
+	  rm -rf $$repo; \
 	  rm -f $(origdir)/$$repo.tar.bz2; \
 	done
+get-orig: fetch-orig dfsg-orig
 
 binary: binary-arch binary-indep
 .PHONY: build build-arch build-indep clean binary-indep binary-arch binary install packaging-files

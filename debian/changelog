@@ -1,13 +1,67 @@
-openjdk-8 (8u151-b12-0ubuntu0.16.04.2) xenial-security; urgency=medium
+openjdk-8 (8u162-b12-0ubuntu0.16.04.2) xenial-security; urgency=medium
+
+  * d/rules, d/control: revert GTK3 dependency to GTK 2.
+
+ -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Tue, 13 Mar 2018 22:44:51 +0000
+
+openjdk-8 (8u162-b12-0ubuntu0.16.04.1) xenial-security; urgency=medium
 
   * Backport to 16.04.
 
- -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Thu, 26 Oct 2017 19:48:24 +0000
+ -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Sat, 03 Mar 2018 00:11:52 +0000
 
-openjdk-8 (8u151-b12-0ubuntu0.17.10.2) artful-security; urgency=medium
+openjdk-8 (8u162-b12-0ubuntu0.17.10.1) artful-security; urgency=medium
+
+  * Update to 8u162-b12. Hotspot 8u162-b12 for aarch32 and 8u161-b16
+    for aarch64 (wth 8u162-b12 patches).
+  * Security updates:
+    - CVE-2018-2633,S8186606: Improve LDAP lookup robustness.
+    - CVE-2018-2637,S8186998: Improve JMX supportive features.
+    - CVE-2018-2634,S8186600: Improve property negotiations.
+    - CVE-2018-2582,S8174962: Better interface invocations.
+    - CVE-2018-2641,S8185325: Improve GTK initialization.
+    - CVE-2018-2618,S8185292: Stricter key generation.
+    - CVE-2018-2629,S8186212: Improve GSS handling.
+    - CVE-2018-2603,S8182387: Improve PKCS usage.
+    - CVE-2018-2599,S8182125: Improve reliability of DNS lookups.
+    - CVE-2018-2602,S8182601: Improve usage messages.
+    - CVE-2018-2588,S8178449: Improve LDAP logins.
+    - CVE-2018-2678,S8191142: More refactoring for naming deserialization
+      cases.
+    - CVE-2018-2677,S8190289: More refactoring for client deserialization
+      cases.
+    - CVE-2018-2663,S8189284: More refactoring for deserialization cases.
+    - CVE-2018-2579,S8172525: Improve key keying case.
+  * d/p/aarch64-hotspot-8u162-b12.patch: update aarch64 hotspot to 8u162-b12.
+  * d/p/icedtea-4953367.patch: removed, fixed upstream by "S8136570: Stop
+    changing user environment variables related to /usr/dt".
+  * d/p/gcc6.diff: removed, fixed upstream.
+  * d/p/jdk-getAccessibleValue.diff: updated, removed chunks fixed upstream
+    by "S8076249: NPE in AccessBridge while editing JList model" and
+    "S8145207: [macosx] JList, VO can't access non-visible list items".
+  * d/p/openjdk-ppc64el-S8170153.patch, d/p/8164293.diff,
+    d/p/hotspot-ppc64el-S8145913-montgomery-multiply-intrinsic.patch,
+    d/p/hotspot-ppc64el-S8168318-cmpldi.patch,
+    d/p/hotspot-ppc64el-S8170328-andis.patch,
+    d/p/hotspot-ppc64el-S8175813-mbind-invalid-argument.patch,
+    d/p/hotspot-ppc64el-S8181055-use-numa-v2-api.patch,
+    d/p/hotspot-ppc64el-S8181810-leverage-extrdi.patch: removed,
+    applied upstream.
+  * d/rules, d/control: depend on GKT3 instead of GTK2. LP: #1735482.
+  * d/rules: wait 10 seconds before issuing SIGKILL to buildwatch.
+  * d/buildwatch.sh: find hs_err files and cat them to help debugging build
+    failures.
+  * S8173853: IllegalArgumentException in java.awt.image.ReplicateScaleFilter.
+    LP: #8173853.
+
+ -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Sat, 03 Mar 2018 00:11:34 +0000
+
+openjdk-8 (8u151-b12-1) unstable; urgency=high
 
   * Update to 8u151-b12. Hotspot 8u144-b01 for aarch32 with 8u151 hotspot
     patches.
+
+  [ Tiago Stürmer Daitx ]
   * Security patches:
     - CVE-2017-10274, S8169026: Handle smartcard clean up better. If a
       CardImpl can be recovered via finalization, then separate instances
@@ -55,31 +109,29 @@ openjdk-8 (8u151-b12-0ubuntu0.17.10.2) artful-security; urgency=medium
       off by one errors found in the zlib library. Two of them are long typed
       which could lead to RCE.
   * debian/rules:
-    - own /usr/share/man/man1 since we use it in the postinst script.
-      Closes: #863199.
     - openjdk8 now ships limited and unlimited policy.jar files (S8157561)
-      into their own directories under jre/lib/security/policy, thus we
-      must to copy those directories instead of the policy.jar files.
-  * debian/rules, debian/patches/sec-webrev-8u151-hotspot-8179084.patch,
-    debian/patches/sec-webrev-8u151-hotspot-8180711.patch: apply
-    hotspot security updates to both aarch32 and aarch64.
-  * debian/patches/gcc6.diff, debian/patches/aarch64.diff,
-    debian/patches/aarch32.diff, debian/patches/m68k-support.diff,
-    debian/patches/system-libjpeg.diff: removed hunks related to
-    the common/autoconf/generated-configure.sh file as we regenerate
-    it, no need to keep maintaining those.
-  * debian/patches/hotspot-ppc64el-S8168318-cmpldi.patch: use cmpldi instead
-    of li/cmpld. LP: #1723893.
-  * debian/patches/hotspot-ppc64el-S8170328-andis.patch: use andis instead of
-    lis/and. LP: #1723862.
-  * debian/patches/hotspot-ppc64el-S8145913-montgomery-multiply-intrinsic.patch:
-    add Montgomery multiply intrinsic. LP: #1723860.
-  * debian/patches/hotspot-ppc64el-S8181810-leverage-extrdi.patch: leverage
-    extrdi for bitfield extract is absent in OpenJDK 8. LP: #1723861.
-  * debian/patches/jdk-S8165852-overlayfs.patch: mount point not found for a
-    file which is present in overlayfs.
+      into their own directories under jre/lib/security/policy.
+  * debian/rules, d/p/sec-webrev-8u151-hotspot-8179084.patch,
+    d/p/sec-webrev-8u151-hotspot-8180711.patch: Apply hotspot security updates
+    to both aarch32 and aarch64.
+  * d/p/gcc6.diff, d/p/aarch64.diff, d/p/aarch32.diff, d/p/m68k-support.diff,
+    d/p/system-libjpeg.diff: Remove hunks related to the generated configure
+    file generated during the build.
+  * d/p/hotspot-ppc64el-S8168318-cmpldi.patch: Use cmpldi instead of li/cmpld.
+    LP: #1723893.
+  * d/p/hotspot-ppc64el-S8170328-andis.patch: Use andis instead of lis/and.
+    LP: #1723862.
+  * d/p/hotspot-ppc64el-S8145913-montgomery-multiply-intrinsic.patch: Add
+    Montgomery multiply intrinsic. LP: #1723860.
+  * d/p/hotspot-ppc64el-S8181810-leverage-extrdi.patch: Leverage extrdi for
+    bitfield extract is absent in OpenJDK 8. LP: #1723861.
+  * d/p/jdk-S8165852-overlayfs.patch: Mount point not found for a file which
+    is present in overlayfs.
 
- -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Mon, 23 Oct 2017 22:43:02 +0000
+  [ Matthias Klose ]
+  * Bump standards version.
+
+ -- Matthias Klose <doko@ubuntu.com>  Wed, 01 Nov 2017 07:12:56 +0100
 
 openjdk-8 (8u144-b01-2) unstable; urgency=medium
 
