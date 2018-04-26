@@ -9,10 +9,6 @@ builddir=$1
 
 echo $$ > buildwatch.pid
 
-trap 'cleanup' 1 2 3 6 15
-
-cleanup () { find "$builddir" -type f -name 'hs_err_pid*.log' -print -exec cat -tn {} \;; exit 1; }
-
 time_unit="m"
 timer=0
 sleep_for=3

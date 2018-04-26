@@ -380,6 +380,13 @@ COMMON_PATCHES = \
 	jdk-i18n-pt_BR.diff \
 	jdk-java-nio-bits-unligned-aarch64.diff \
 	jdk-S8165852-overlayfs.patch \
+	hotspot-S8185723-zero-ppc32-atomic_copy64-fix.patch \
+	hotspot-S8201509-zero-s390x-atomic_copy64-fix.patch \
+
+ifeq ($(derivative),Debian)
+  COMMON_PATCHES += \
+	hotspot-disable-exec-shield-workaround.patch
+endif
 
 #	jdk-derived-font-size.diff \
 # FIXME: update patches
@@ -441,13 +448,16 @@ ifneq (,$(filter $(DEB_HOST_ARCH), kfreebsd-amd64 kfreebsd-i386))
 	kfreebsd-support-hotspot.diff
 endif
 
-# apply 8u162-b12 hotspot patches to aarch64
-ifneq (,$(filter $(DEB_HOST_ARCH),$(hotspot_aarch64_archs)))
+# apply zero hotspot fix to aarch32
+# apply 8u171-b10 security update patches to aarch32
+ifneq (,$(filter $(DEB_HOST_ARCH), $(hotspot_aarch32_archs)))
   COMMON_PATCHES += \
-	aarch64-hotspot-8u162-b12.diff
-else
-  COMMON_PATCHES += \
-	zero-hotspot-S819432.patch
+	zero-hotspot-S819432.patch \
+	sec-webrev-8u171-S8180881.hotspot.patch \
+	sec-webrev-8u171-S8189123.hotspot.patch \
+	sec-webrev-8u171-S8190478.hotspot.patch \
+	sec-webrev-8u171-S8190877.hotspot.patch \
+	sec-webrev-8u171-S8192025.hotspot.patch
 endif
 
 DEFAULT_PATCHES = \
@@ -685,8 +695,13 @@ bd_syslibs += \
 	libgif-dev,
 bd_openjdk = \
 	libxtst-dev, libxi-dev, libxt-dev, libxaw7-dev, libxrender-dev, libcups2-dev, \
-	libasound2-dev, liblcms2-dev, libfreetype6-dev (>= 2.2.1), libgtk2.0-dev, \
+	libasound2-dev, liblcms2-dev, libfreetype6-dev (>= 2.2.1), \
 	libxinerama-dev, libkrb5-dev, xsltproc, libpcsclite-dev,
+ifneq (,$(filter $(distrel),wheezy xenial artful))
+  bd_openjdk += libgtk2.0-dev,
+else
+  bd_openjdk += libgtk-3-dev,
+endif
 
 pkg_ffidev = libffi-dev
 
@@ -762,7 +777,13 @@ ifneq ($(with_nss),no)
 endif
 dlopen_hl_recommends =
 dlopen_jre_depends = \
-	libglib2.0-0 (>= 2.24), libgtk2.0-0 (>= 2.14), libxrandr2, libxinerama1, libgl1-mesa-glx | libgl1
+	libglib2.0-0 (>= 2.24), libxrandr2, libxinerama1, libgl1-mesa-glx | libgl1,
+ifneq (,$(filter $(distrel),wheezy xenial artful))
+  dlopen_jre_depends += libgtk2.0-0 (>= 2.14),
+else
+  dlopen_jre_depends += libgtk-3-0,
+endif
+
 dlopen_jre_recommends =
 
 plugin_name = IcedTeaPlugin.so
@@ -2186,14 +2207,14 @@ endif
 is_release		=
 is_release		= yes
 hg_project		= jdk8u
-hg_tag			= jdk8u162-b12
+hg_tag			= jdk8u171-b11
 package_version		= $(subst jdk,,$(hg_tag))
 ifneq ($(is_release),yes)
   package_version	:= $(subst -,~,$(package_version))
 endif
 hg_url			= http://hg.openjdk.java.net/jdk8u/$(hg_project)
 hg_project_aarch64	= jdk8u
-hg_tag_aarch64		= aarch64-jdk8u161-b16
+hg_tag_aarch64		= aarch64-jdk8u171-b10
 hg_url_aarch64		= http://hg.openjdk.java.net/aarch64-port/$(hg_project_aarch64)
 hg_project_aarch32	= jdk8u
 hg_tag_aarch32		= jdk8u162-b12-aarch32-180220

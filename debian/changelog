@@ -1,17 +1,38 @@
-openjdk-8 (8u162-b12-0ubuntu0.16.04.2) xenial-security; urgency=medium
+openjdk-8 (8u171-b11-0ubuntu0.16.04.1) xenial-security; urgency=medium
 
-  * d/rules, d/control: revert GTK3 dependency to GTK 2.
+  * Update to 8u171-b11. Hotspot 8u162-b12 for aarch32 with 8u171-b10 hotspot
+    security fixes and 8u171-b10 for aarch64.
+    - CVE-2018-2790,S8189969: Manifest better manifest entries.
+    - CVE-2018-2795,S8189977: Improve permission portability.
+    - CVE-2018-2796,S8189981: Improve queuing portability.
+    - CVE-2018-2797,S8189985: Improve tabular data portability.
+    - CVE-2018-2798,S8189989: Improve container portability.
+    - CVE-2018-2799,S8189993: Improve document portability.
+    - CVE-2018-2794,S8189997: Enhance keystore mechanisms.
+    - CVE-2018-2814,S8192025: Less referential references.
+    - CVE-2018-2815,S8192757: Improve stub classes implementation.
+    - CVE-2018-2800,S8193833: Better RMI connection support.
+    - S8169080: Improve documentation examples for crypto applications.
+    - S8180881: Better packaging of deserialization.
+    - S8182362: Update CipherOutputStream Usage.
+    - S8189123: More consistent classloading.
+    - S8190478: Improved interface method selection.
+    - S8190877: Better handling of abstract classes.
+    - S8191696: Better mouse positioning.
+    - S8192030: Better MTSchema support.
+    - S8193409: Improve AES supporting classes.
+    - S8193414: Improvements in MethodType lookups.
+  * d/p/aarch64-hotspot-8u162-b12.patch: removed, tarball has been updated to
+    8u171-b10.
+  * d/p/hotspot-S8185723-zero-ppc32-atomic_copy64-fix.patch,
+    d/p/hotspot-S8201509-zero-s390x-atomic_copy64-fix.patch: fix ppc32, s390x
+    javac segmentation fault caused by wrong inline assembler.
 
- -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Tue, 13 Mar 2018 22:44:51 +0000
+ -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Thu, 26 Apr 2018 15:59:34 +0000
 
-openjdk-8 (8u162-b12-0ubuntu0.16.04.1) xenial-security; urgency=medium
+openjdk-8 (8u162-b12-1) unstable; urgency=high
 
-  * Backport to 16.04.
-
- -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Sat, 03 Mar 2018 00:11:52 +0000
-
-openjdk-8 (8u162-b12-0ubuntu0.17.10.1) artful-security; urgency=medium
-
+  [ Tiago Stürmer Daitx ]
   * Update to 8u162-b12. Hotspot 8u162-b12 for aarch32 and 8u161-b16
     for aarch64 (wth 8u162-b12 patches).
   * Security updates:
@@ -47,14 +68,20 @@ openjdk-8 (8u162-b12-0ubuntu0.17.10.1) artful-security; urgency=medium
     d/p/hotspot-ppc64el-S8181055-use-numa-v2-api.patch,
     d/p/hotspot-ppc64el-S8181810-leverage-extrdi.patch: removed,
     applied upstream.
-  * d/rules, d/control: depend on GKT3 instead of GTK2. LP: #1735482.
+  * d/rules, d/control: depend on GKT3 instead of GTK2 for newer releases.
+    LP: #1735482.
   * d/rules: wait 10 seconds before issuing SIGKILL to buildwatch.
   * d/buildwatch.sh: find hs_err files and cat them to help debugging build
     failures.
   * S8173853: IllegalArgumentException in java.awt.image.ReplicateScaleFilter.
     LP: #8173853.
 
- -- Tiago Stürmer Daitx <tiago.daitx@ubuntu.com>  Sat, 03 Mar 2018 00:11:34 +0000
+  [ Matthias Klose ]
+  * Disable Hotspot workaround for Exec Shield (Debian only).
+    Closes: #876051.
+  * Fix some lintian warnings.
+
+ -- Matthias Klose <doko@ubuntu.com>  Thu, 15 Mar 2018 18:19:50 +0100
 
 openjdk-8 (8u151-b12-1) unstable; urgency=high
 
@@ -82,17 +109,17 @@ openjdk-8 (8u151-b12-1) unstable; urgency=high
       missing load constraint for some invokespecial cases can allow invoking
       a method from an unrelated class.
     - CVE-2017-10350, S8181100: Better Base Exceptions. An array is allocated
-      based on data in the serial stream without a limit onthe size.
+      based on data in the serial stream without a limit on the size.
     - CVE-2017-10347, S8181323: Better timezone processing. An array is
       allocated based on data in the serial stream without a limit on the
       size.
     - CVE-2017-10349, S8181327: Better Node predications. An array is
-      allocated based on data in the serial stream without a limit onthe size.
+      allocated based on data in the serial stream without a limit on the size.
     - CVE-2017-10345, S8181370: Better keystore handling. A malicious
       serialized object in a keystore can cause a DoS when using keytool.
     - CVE-2017-10348, S8181432: Better processing of unresolved permissions.
       An array is allocated based on data in the serial stream without a limit
-      onthe size.
+      on the size.
     - CVE-2017-10357, S8181597: Process Proxy presentation. A malicious
       serialized stream could cause an OOM due to lack on checking on the
       number of interfaces read from the stream for a Proxy.
